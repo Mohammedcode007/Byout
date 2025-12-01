@@ -6,6 +6,7 @@ import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useMemo, useRef, useState } from 'react';
 import { I18nManager, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Portal } from 'react-native-paper';
 import MultiWordTagBox from './MultiWordTagBox';
 import TagBox from './TagBox';
 
@@ -203,6 +204,7 @@ export default function SearchFilters({ onFilterPress, onClearFilters }: Props) 
       </ScrollView>
 
       {/* BottomSheet */}
+      <Portal>
 
       <BottomSheet
         ref={bottomSheetRef}
@@ -751,6 +753,7 @@ export default function SearchFilters({ onFilterPress, onClearFilters }: Props) 
 
         </BottomSheetView>
       </BottomSheet>
+      </Portal>
 
     </View>
   );
