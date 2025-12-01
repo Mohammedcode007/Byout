@@ -1,9 +1,13 @@
+import AuthGate from '@/components/AuthGate';
+import React from 'react';
 import { Text, View } from 'react-native';
 
-export default function SearchScreen() {
+export default function SaveScreen() {
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Search Screen</Text>
-    </View>
+    <AuthGate>
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>save Screen</Text>
+      </View>
+    </AuthGate>
   );
 }

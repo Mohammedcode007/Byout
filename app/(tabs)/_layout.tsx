@@ -22,6 +22,8 @@ export default function TabLayout() {
     <Tabs.Screen
   name="index"
   options={{
+        title: 'الرئيسية',
+
     tabBarIcon: ({ color, focused }) => (
       <AnimatedTabIcon
         name="house.fill"
@@ -38,7 +40,7 @@ export default function TabLayout() {
    <Tabs.Screen
   name="search"
   options={{
-    title: 'Search',
+    title: 'البحث',
     tabBarIcon: ({ color, focused }) => (
       <AnimatedTabIcon
         name="magnifyingglass"
@@ -55,7 +57,7 @@ export default function TabLayout() {
     <Tabs.Screen
   name="save"
   options={{
-    title: 'Save',
+    title: 'المحفوظ',
     tabBarIcon: ({ color, focused }) => (
       <AnimatedTabIcon
         name="bookmark.fill"
@@ -72,7 +74,7 @@ export default function TabLayout() {
 <Tabs.Screen
   name="more"
   options={{
-    title: 'More',
+    title: 'المزيد',
     tabBarIcon: ({ color, focused }) => (
       <AnimatedTabIcon
         name="ellipsis.horizontal"
