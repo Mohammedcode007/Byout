@@ -2,11 +2,11 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withSpring,
-    withTiming,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSpring,
+  withTiming,
 } from 'react-native-reanimated';
 
 export default function AnimatedTabIcon({ name, color, size, focused }) {
@@ -101,56 +101,57 @@ export default function AnimatedTabIcon({ name, color, size, focused }) {
   }));
 
 
-  return (
-    <View style={{ width: size + 40, height: size + 40, justifyContent: 'center', alignItems: 'center' }}>
+return (
+  <View style={{ width: size + 30, height: size + 30, justifyContent: 'center', alignItems: 'center' }}>
 
-      {/* مربع يسار */}
-      <Animated.View
-        style={[
-          {
-            position: 'absolute',
-            width: size + 10,
-            height: size + 10,
-            borderRadius: 10,
-            backgroundColor: '#FFD86B',
-          },
-          squareLeft,
-        ]}
-      />
+    {/* مربع يسار */}
+    <Animated.View
+      style={[
+        {
+          position: 'absolute',
+          width: size + 8,
+          height: size + 8,
+          borderRadius: 8,
+          backgroundColor: 'rgba(100, 150, 255, 0.2)', // أزرق باهت
+        },
+        squareLeft,
+      ]}
+    />
 
-      {/* مربع يمين */}
-      <Animated.View
-        style={[
-          {
-            position: 'absolute',
-            width: size + 10,
-            height: size + 10,
-            borderRadius: 10,
-            backgroundColor: '#6BD6FF',
-          },
-          squareRight,
-        ]}
-      />
+    {/* مربع يمين */}
+    <Animated.View
+      style={[
+        {
+          position: 'absolute',
+          width: size + 8,
+          height: size + 8,
+          borderRadius: 8,
+          backgroundColor: 'rgba(255, 150, 100, 0.2)', // برتقالي باهت
+        },
+        squareRight,
+      ]}
+    />
 
-      {/* النجمة */}
-      <Animated.Text
-        style={[
-          {
-            position: 'absolute',
-            fontSize: size - 6,
-            color: '#FFB800',
-          },
-          starStyle,
-        ]}
-      >
-        ★
-      </Animated.Text>
+    {/* النجمة */}
+    <Animated.Text
+      style={[
+        {
+          position: 'absolute',
+          fontSize: size - 10,
+          color: 'rgba(255, 200, 0, 0.3)', // أصفر باهت
+        },
+        starStyle,
+      ]}
+    >
+      ★
+    </Animated.Text>
 
-      {/* الأيقونة */}
-      <Animated.View style={iconStyle}>
-        <IconSymbol name={name} size={size} color={color} />
-      </Animated.View>
+    {/* الأيقونة */}
+    <Animated.View style={iconStyle}>
+      <IconSymbol name={name} size={size} color={color} />
+    </Animated.View>
 
-    </View>
-  );
+  </View>
+);
+
 }

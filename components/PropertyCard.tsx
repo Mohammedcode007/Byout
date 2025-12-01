@@ -70,19 +70,7 @@ const PropertyCard: React.FC<PropertyProps> = ({
                 ))}
             </ScrollView>
 
-            {/* Slider للسعر */}
-            {/* <View style={{ marginVertical: 10 }}>
-                <Text style={{ marginBottom: 5, textAlign: 'right' }}>السعر: {sliderValue} جنيه</Text>
-                <Slider
-                    minimumValue={priceRange.from}
-                    maximumValue={priceRange.to}
-                    step={100}
-                    value={sliderValue}
-                    onValueChange={setSliderValue}
-                    minimumTrackTintColor="rgba(0,128,0,0.4)"
-                    maximumTrackTintColor="#ccc"
-                />
-            </View> */}
+          
 
             {/* معلومات العقار */}
             <View style={[styles.infoRow, { justifyContent: 'flex-end' }]}>
@@ -107,24 +95,43 @@ const PropertyCard: React.FC<PropertyProps> = ({
             <Text style={{ fontWeight: '700', fontSize: 16, textAlign: 'right' }}>{title}</Text>
 
             {/* التسليم والمقدم والسعر */}
-            <View style={[styles.infoRow, { justifyContent: 'flex-end' }]}>
-                <Text style={{ textAlign: 'right' }}>تاريخ التسليم: {deliveryDate}</Text>
-                <Text style={{ textAlign: 'right' }}>مقدم: {advance}</Text>
-                <Text style={{ textAlign: 'right' }}>السعر: {sliderValue} جنيه</Text>
-            </View>
+  <View style={{ 
+    flexDirection: "column",
+    alignItems: "flex-end",
+    marginTop: 10
+}}>
+    {/* التسليم */}
+    <View style={styles.infoTagRow}>
+        <Ionicons name="calendar-outline" size={14} color="#003366" style={{ marginLeft: 4 }} />
+        <Text style={styles.infoTagText}>التسليم: {deliveryDate}</Text>
+    </View>
+
+    {/* المقدم */}
+    <View style={styles.infoTagRow}>
+        <Ionicons name="cash-outline" size={14} color="#003366" style={{ marginLeft: 4 }} />
+        <Text style={styles.infoTagText}>مقدم: {advance}</Text>
+    </View>
+
+    {/* السعر */}
+    <View style={styles.infoTagRow}>
+        <Ionicons name="pricetag-outline" size={14} color="#003366" style={{ marginLeft: 4 }} />
+        <Text style={styles.infoTagText}>السعر: {sliderValue} جنيه</Text>
+    </View>
+</View>
+
 
             {/* 3 تواصل */}
             <View style={[styles.infoRow, { marginTop: 10, justifyContent: 'center' }]}>
                 <Pressable style={styles.contactTag}>
-                    <Ionicons name="mail-outline" size={16} color="#fff" />
+                    <Ionicons name="mail-outline" size={16} color="#003366" />
                     <Text style={styles.contactText}>إيميل</Text>
                 </Pressable>
                 <Pressable style={styles.contactTag}>
-                    <Ionicons name="call-outline" size={16} color="#fff" />
+                    <Ionicons name="call-outline" size={16} color="#003366" />
                     <Text style={styles.contactText}>اتصال</Text>
                 </Pressable>
                 <Pressable style={styles.contactTag}>
-                    <FontAwesome name="whatsapp" size={16} color="#fff" />
+                    <FontAwesome name="whatsapp" size={16} color="#003366" />
                     <Text style={styles.contactText}>واتساب</Text>
                 </Pressable>
             </View>
@@ -184,7 +191,7 @@ const styles = StyleSheet.create({
     contactTag: {
         flexDirection: 'row-reverse',
         alignItems: 'center',
-        backgroundColor: 'rgba(169, 175, 169, 0.7)',
+        backgroundColor: 'rgba(217, 248, 217, 0.7)',
         paddingHorizontal: 10,
         paddingVertical: 6,
         borderRadius: 10,
@@ -194,9 +201,28 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     contactText: {
-        color: '#fff',
+    color: '#003366', // أزرق غامق
         marginRight: 5,
         textAlign: 'right',
 
     },
+ infoTagRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 122, 255, 0.15)', // أزرق شفاف
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 4,
+    marginBottom: 6,
+},
+
+infoTagText: {
+    color: '#003366', // أزرق غامق
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'right',
+},
+
+
+
 });
