@@ -1,3 +1,5 @@
+import { useAppDispatch, useAppSelector } from '@/hooks/useAuth';
+import { login } from '@/store/authSlice';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -6,19 +8,27 @@ import { Button, TextInput, Title } from 'react-native-paper';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { loading } = useAppSelector(state => state.auth); // حالة التحميل
 
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!emailOrPhone || !password) {
       Alert.alert('خطأ', 'يرجى ملء جميع الحقول');
       return;
     }
 
-    // منطق تسجيل الدخول عبر API أو قاعدة بيانات
-    Alert.alert('نجاح', 'تم تسجيل الدخول بنجاح');
-    router.replace('/(tabs)');
+    const payload = { email: emailOrPhone, password }; // ارسال payload
+    const res = await dispatch(login(payload));
+
+    if (res.meta.requestStatus === 'fulfilled') {
+      Alert.alert('نجاح', 'تم تسجيل الدخول بنجاح');
+      router.replace('/(tabs)'); // الانتقال للواجهة الرئيسية
+    } else {
+      Alert.alert('خطأ', res.payload || 'حدث خطأ أثناء تسجيل الدخول');
+    }
   };
 
   return (
@@ -48,8 +58,14 @@ export default function LoginScreen() {
         textAlign="right"
       />
 
-      {/* زر تسجيل الدخول */}
-      <Button mode="contained" onPress={handleLogin} style={styles.button}>
+      {/* زر تسجيل الدخول مع Loading */}
+      <Button
+        mode="contained"
+        onPress={handleLogin}
+        style={styles.button}
+        loading={loading}
+        disabled={loading}
+      >
         تسجيل الدخول
       </Button>
 
