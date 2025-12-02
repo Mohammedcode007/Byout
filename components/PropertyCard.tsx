@@ -15,6 +15,8 @@ interface PropertyProps {
     deliveryDate: string;
     advance: string;
     tags: string[];
+      onPress?: () => void; // ← أضفنا هذه الخاصية
+
 }
 
 const PropertyCard: React.FC<PropertyProps> = ({
@@ -28,6 +30,8 @@ const PropertyCard: React.FC<PropertyProps> = ({
     deliveryDate,
     advance,
     tags,
+      onPress, // ← استخدمناها هنا
+
 }) => {
     const [liked, setLiked] = useState(false);
     const [sliderValue, setSliderValue] = useState(priceRange.from);
@@ -42,7 +46,8 @@ const PropertyCard: React.FC<PropertyProps> = ({
                 contentContainerStyle={{ paddingRight: 16 }}
             >
                 {images.map((img, index) => (
-                    <View
+                    <Pressable 
+                    onPress={onPress}
                         key={index}
                         style={[
                             styles.imageWrapper,
@@ -66,7 +71,7 @@ const PropertyCard: React.FC<PropertyProps> = ({
                         >
                             <Ionicons name={liked ? "heart" : "heart-outline"} size={24} color="red" />
                         </Pressable>
-                    </View>
+                    </Pressable >
                 ))}
             </ScrollView>
 
