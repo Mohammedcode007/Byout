@@ -1,100 +1,9 @@
 
 
-// import { Ionicons } from '@expo/vector-icons';
-// import { Tabs } from 'expo-router';
-// import React, { useRef } from 'react';
-// import { Animated, Platform } from 'react-native';
-
-// // إنشاء context لتمرير scrollY للشاشات
-// export const ScrollYContext = React.createContext<Animated.Value>(new Animated.Value(0));
-
-// export default function TabLayout() {
-//   const scrollY = useRef(new Animated.Value(0)).current;
-
-//   // تداخل translateY مع scrollY
-//   const tabTranslateY = scrollY.interpolate({
-//     inputRange: [0, 50], // كلما نزلت 50 بكسل
-//     outputRange: [0, 80], // اختفاء التابس بمقدار 80
-//     extrapolate: 'clamp',
-//   });
-
-//   return (
-//     <ScrollYContext.Provider value={scrollY}>
-//       <Tabs
-//         screenOptions={{
-//           headerShown: false,
-//           tabBarShowLabel: false,
-//           tabBarStyle: {
-//             position: 'absolute',
-//             bottom: 20,
-//             left: 20,
-//             right: 20,
-//             height: 60,
-//             borderRadius: 15,
-//             backgroundColor: 'rgba(255,255,255,0.95)',
-//             shadowColor: '#000',
-//             shadowOpacity: 0.1,
-//             shadowRadius: 10,
-//             elevation: 6,
-//             transform: [{ translateY: tabTranslateY }] as any,
-//             // للـ iOS smooth animation
-//             ...(Platform.OS === 'ios' && { zIndex: 10 }),
-//           } as any,
-//         }}
-//       >
-//         <Tabs.Screen
-//           name="index"
-//           options={{
-//             tabBarIcon: ({ color, focused }) =>
-//               focused ? (
-//                 <Ionicons name="home" size={28} color={color} />
-//               ) : (
-//                 <Ionicons name="home-outline" size={28} color={color} />
-//               ),
-//         }}
-//         />
-//         <Tabs.Screen
-//           name="search"
-//           options={{
-//             tabBarIcon: ({ color, focused }) =>
-//               focused ? (
-//                 <Ionicons name="search" size={28} color={color} />
-//               ) : (
-//                 <Ionicons name="search-outline" size={28} color={color} />
-//               ),
-//         }}
-//         />
-//         <Tabs.Screen
-//           name="save"
-//           options={{
-//             tabBarIcon: ({ color, focused }) =>
-//               focused ? (
-//                 <Ionicons name="bookmark" size={28} color={color} />
-//               ) : (
-//                 <Ionicons name="bookmark-outline" size={28} color={color} />
-//               ),
-//         }}
-//         />
-//         <Tabs.Screen
-//           name="more"
-//           options={{
-//             tabBarIcon: ({ color, focused }) =>
-//               focused ? (
-//                 <Ionicons name="apps" size={28} color={color} />
-//               ) : (
-//                 <Ionicons name="apps-outline" size={28} color={color} />
-//               ),
-//         }}
-//         />
-//       </Tabs>
-//     </ScrollYContext.Provider>
-//   );
-// }
-
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Platform, StyleSheet } from 'react-native';
+import { Animated, Easing, Platform, StyleSheet } from 'react-native';
 
 // Context لتمرير scrollY
 export const ScrollYContext = React.createContext<Animated.Value>(new Animated.Value(0));
@@ -103,22 +12,47 @@ export const ScrollYContext = React.createContext<Animated.Value>(new Animated.V
 const AnimatedTabIcon = ({
   iconName,
   focused,
-  isAnyFocused, // أضفتها هنا
 }: {
   iconName: string;
   focused: boolean;
-  isAnyFocused?: boolean; // اختياري لو مش دايمًا هيتمرر
 }) => {
   const scaleAnim = useRef(new Animated.Value(focused ? 1.3 : 1)).current;
-  const bgAnim = focused ? 'rgba(108,92,231,0.2)' : 'transparent';
+  const fadeAnim = useRef(new Animated.Value(focused ? 1 : 0)).current;
+
+  const widthAnim = useRef(new Animated.Value(focused ? 90 : 50)).current; // ضبط العرض
+  const bgWidthAnim = useRef(new Animated.Value(focused ? 0 : 0)).current;
 
   useEffect(() => {
-    Animated.timing(scaleAnim, {
-      toValue: focused ? 1.3 : 1,
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
+    Animated.parallel([
+      Animated.timing(scaleAnim, {
+        toValue: focused ? 1.3 : 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: focused ? 1 : 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(widthAnim, {
+        toValue: focused ? 90 : 50,
+        duration: 230,
+        useNativeDriver: false,
+      }),
+      Animated.timing(bgWidthAnim, {
+        toValue: focused ? 1 : 0,
+        duration: 500,
+        easing: Easing.out(Easing.exp),
+        useNativeDriver: false,
+      }),
+    ]).start();
   }, [focused]);
+
+  // تدرج عرض الخلفية
+  const backgroundWidth = bgWidthAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0%', '100%'],
+  });
 
   let displayIconName: any = iconName;
   if (iconName === 'home') displayIconName = focused ? 'home' : 'home-outline';
@@ -126,31 +60,75 @@ const AnimatedTabIcon = ({
   else if (iconName === 'bookmark') displayIconName = focused ? 'bookmark' : 'bookmark-outline';
   else if (iconName === 'apps') displayIconName = focused ? 'apps' : 'apps-outline';
 
+  const labels: any = {
+    home: "الرئيسية",
+    search: "البحث",
+    bookmark: "حفظ",
+    apps: "المزيد",
+  };
+
   return (
     <Animated.View
       style={{
-        width: 60,
+        width: 80,
         height: 44,
-        borderRadius: 10,
+        borderRadius: 25,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: bgAnim,
+        overflow: 'hidden',
       }}
     >
-      <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-        <Ionicons name={displayIconName} size={28} color={focused ? '#6c5ce7' : '#333'} />
+      {/* الخلفية المتحركة */}
+      <Animated.View
+        style={{
+          position: 'absolute',
+          alignItems: 'center',
+          justifyContent: 'center',
+          top: 0,
+          bottom: 0,
+          width: backgroundWidth,
+          backgroundColor: 'rgba(108,92,231,0.15)',
+          borderRadius: 25, // مهم لحواف ناعمة
+        }}
+      />
+
+      {/* محتوى التاب */}
+      <Animated.View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingHorizontal: 20,
+        }}
+      >
+        <Animated.View style={{ transform: [{ scale: scaleAnim }], marginLeft: 20 }}>
+          <Ionicons
+            name={displayIconName}
+            size={18}
+            color={focused ? '#6c5ce7' : '#333'}
+          />
+        </Animated.View>
+
+        <Animated.Text
+          style={{
+            marginLeft: 4,
+            opacity: fadeAnim,
+            color: '#6c5ce7',
+            fontSize: 10,
+            fontWeight: '600',
+          }}
+        >
+          {labels[iconName]}
+        </Animated.Text>
       </Animated.View>
     </Animated.View>
   );
 };
 
-
-
 export default function TabLayout() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const [focusedTab, setFocusedTab] = useState<string>('index');
 
-  // translateY للـ tabBar عند scroll
   const tabTranslateY = scrollY.interpolate({
     inputRange: [0, 50],
     outputRange: [0, 80],
@@ -170,21 +148,34 @@ export default function TabLayout() {
         screenOptions={{
           headerShown: false,
           tabBarShowLabel: false,
+          tabBarItemStyle: {
+            width: 'auto',
+            paddingHorizontal: 0,
+            marginHorizontal: 0,
+            marginTop: 10,
+
+            justifyContent: 'center',
+            alignItems: 'center',
+          },
           tabBarStyle: {
             position: 'absolute',
-            bottom: 20,
-            left: 20,
-            right: 20,
-            height: 40,
-            borderRadius: 15,
+            bottom: 30,
+            marginLeft: 10,
+            marginRight: 10,
+            left: 10,   // مسافة من الحافة
+            right: 10,  // مسافة من الحافة
+            height: 60,
+            borderRadius: 25,
             backgroundColor: 'rgba(255,255,255,0.95)',
             shadowColor: '#000',
             shadowOpacity: 0.1,
             shadowRadius: 10,
             elevation: 6,
             transform: [{ translateY: tabTranslateY }] as any,
+            justifyContent: 'center',
+            alignItems: 'center',
             ...(Platform.OS === 'ios' && { zIndex: 10 }),
-          } as any,
+          },
         }}
       >
         {screens.map((screen) => (
@@ -196,7 +187,6 @@ export default function TabLayout() {
                 <AnimatedTabIcon
                   iconName={screen.icon}
                   focused={focused}
-                  isAnyFocused={focusedTab !== screen.name}
                 />
               ),
             }}
