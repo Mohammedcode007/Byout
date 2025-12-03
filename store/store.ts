@@ -3,13 +3,19 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { persistReducer, persistStore } from "redux-persist";
 import authReducer from "./authSlice";
+import propertyReducer from "./propertieSlice"; // مسار الملف عندك
+
 
 const persistConfig = { key: "root", storage: AsyncStorage, whitelist: ["auth"] };
-const rootReducer = combineReducers({ auth: authReducer });
+const rootReducer = combineReducers({
+  auth: authReducer,       // مخزن auth مع persist
+  property: propertyReducer, // مخزن property بدون persist
+});
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
   reducer: persistedReducer,
+
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }),
 });

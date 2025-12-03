@@ -96,11 +96,12 @@
 // }
 
 import LocationBar from '@/components/LocationBar';
-import PropertyCard from '@/components/PropertyCard';
 import SearchFilters from '@/components/SearchFilters';
+import { useAppDispatch, useAppSelector } from '@/hooks/useAuth';
+import { fetchProperties } from '@/store/propertieSlice';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { ScrollView, View, useColorScheme } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SearchScreen() {
@@ -108,50 +109,56 @@ export default function SearchScreen() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
+const dispatch = useAppDispatch();
+const { properties, loading, error } = useAppSelector((state) => state.property);
+console.log(properties);
 
+useEffect(() => {
+  dispatch(fetchProperties()); // لازم تستدعي الـ thunk هنا
+}, []);
   const backgroundColor = isDark ? '#121212' : '#fff';
 
-  const properties = [
-    {
-      id: 1,
-      images: [
-        'https://www.contemporist.com/wp-content/uploads/2017/05/modern-house-design-swimming-pool-160517-950-01-800x533.jpg',
-        'https://res.cloudinary.com/stannard-homes/image/fetch/c_fill,g_auto,f_auto,dpr_auto,w_1170,h_617/https://stannard-homes-assets.s3.ap-southeast-2.amazonaws.com/app/uploads/2021/09/19134557/042.jpg',
-      ],
-      priceRange: { from: 1000, to: 5000 },
-      beds: 3,
-      baths: 2,
-      area: 120,
-      description: 'شقة رائعة بموقع ممتاز.',
-      title: 'شقة للبيع في القاهرة',
-      deliveryDate: '12/2025',
-      advance: '200,000',
-      tags: ['قيد الإنشاء', 'مميز'],
-    },
-    {
-      id: 2,
-      images: [
-        'https://www.thithithara.com/storage/property/images/2656_image_1708220798.jpg',
-        'https://futurestiles.com/wp-content/uploads/2024/11/Black-Elegant-Interior-Design-Presentation-2024-11-23T181925.075-2.jpg',
-      ],
-      priceRange: { from: 2000, to: 6000 },
-      beds: 4,
-      baths: 3,
-      area: 180,
-      description: 'فيلا فاخرة بالقرب من البحر.',
-      title: 'فيلا للبيع في الإسكندرية',
-      deliveryDate: '06/2026',
-      advance: '500,000',
-      tags: ['مميز'],
-    },
-  ];
+  // const properties = [
+  //   {
+  //     id: 1,
+  //     images: [
+  //       'https://www.contemporist.com/wp-content/uploads/2017/05/modern-house-design-swimming-pool-160517-950-01-800x533.jpg',
+  //       'https://res.cloudinary.com/stannard-homes/image/fetch/c_fill,g_auto,f_auto,dpr_auto,w_1170,h_617/https://stannard-homes-assets.s3.ap-southeast-2.amazonaws.com/app/uploads/2021/09/19134557/042.jpg',
+  //     ],
+  //     priceRange: { from: 1000, to: 5000 },
+  //     beds: 3,
+  //     baths: 2,
+  //     area: 120,
+  //     description: 'شقة رائعة بموقع ممتاز.',
+  //     title: 'شقة للبيع في القاهرة',
+  //     deliveryDate: '12/2025',
+  //     advance: '200,000',
+  //     tags: ['قيد الإنشاء', 'مميز'],
+  //   },
+  //   {
+  //     id: 2,
+  //     images: [
+  //       'https://www.thithithara.com/storage/property/images/2656_image_1708220798.jpg',
+  //       'https://futurestiles.com/wp-content/uploads/2024/11/Black-Elegant-Interior-Design-Presentation-2024-11-23T181925.075-2.jpg',
+  //     ],
+  //     priceRange: { from: 2000, to: 6000 },
+  //     beds: 4,
+  //     baths: 3,
+  //     area: 180,
+  //     description: 'فيلا فاخرة بالقرب من البحر.',
+  //     title: 'فيلا للبيع في الإسكندرية',
+  //     deliveryDate: '06/2026',
+  //     advance: '500,000',
+  //     tags: ['مميز'],
+  //   },
+  // ];
 
-  const handleCardPress = (property: typeof properties[0]) => {
-    router.push({
-      pathname: '/property/[id]',
-      params: { id: property.id.toString() },
-    });
-  };
+  // const handleCardPress = (property: typeof properties[0]) => {
+  //   router.push({
+  //     pathname: '/property/[id]',
+  //     params: { id: property.id.toString() },
+  //   });
+  // };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor }}>
@@ -170,7 +177,7 @@ export default function SearchScreen() {
       </View>
 
       {/* قائمة العقارات */}
-      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 50 }}>
+      {/* <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 50 }}>
         {properties.map((property) => (
           <View key={property.id} style={{ marginBottom: 20 }}>
             <PropertyCard
@@ -188,7 +195,7 @@ export default function SearchScreen() {
             />
           </View>
         ))}
-      </ScrollView>
+      </ScrollView> */}
     </SafeAreaView>
   );
 }
