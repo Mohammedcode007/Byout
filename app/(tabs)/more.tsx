@@ -4,10 +4,11 @@ import MoreItem from '@/components/MoreItem';
 import { useAppDispatch, useAppSelector } from '@/hooks/useAuth';
 import i18n, { loadLocale, setLocale } from '@/i18n';
 import { logout } from '@/store/authSlice';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as Updates from 'expo-updates';
 import React, { useContext, useEffect, useState } from 'react';
-import { Animated, I18nManager, Image, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, I18nManager, Image, Modal, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 import { Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollYContext } from './_layout';
@@ -17,7 +18,9 @@ export default function MoreScreen() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isLoggedIn } = useAppSelector(state => state.auth);
-
+  const { user, token, loading } = useAppSelector((state) => state.auth);
+const colorScheme = useColorScheme(); // 'light' أو 'dark'
+  const isDark = colorScheme === 'dark';
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const [selectedLang, setSelectedLang] = useState<'en' | 'ar'>(i18n.locale.startsWith('ar') ? 'ar' : 'en');
 
@@ -65,9 +68,9 @@ export default function MoreScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+  <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? '#121212' : '#fff' }}>
       <Animated.ScrollView
-        style={{ flex: 1, backgroundColor: '#fff', paddingTop: 20 }}
+        style={{ flex: 1, backgroundColor: isDark ? '#121212' : '#fff', paddingTop: 20 }}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: true }
@@ -79,43 +82,60 @@ export default function MoreScreen() {
             source={{ uri: 'https://st2.depositphotos.com/1001877/10342/i/450/depositphotos_103428244-stock-photo-house-and-loupe-magnifying-glass.jpg' }}
             style={styles.headerImage}
           />
+
           {!isLoggedIn ? (
-            <Button mode="contained" style={styles.loginButton} onPress={() => router.push('/Login')}>
+            <Button
+              mode="contained"
+              style={[styles.loginButton, { backgroundColor: isDark ? '#6c5ce7' : '#1b4414ff' }]}
+              labelStyle={{ color: isDark ? '#fff' : '#fff' }}
+              onPress={() => router.push('/Login')}
+            >
               تسجيل دخول
             </Button>
           ) : (
-            <Button mode="outlined" style={[styles.loginButton, { backgroundColor: '#fff', borderColor: '#6c5ce7' }]} onPress={handleLogout}>
-              تسجيل خروج
-            </Button>
+            <View style={[styles.loggedInContainer, { backgroundColor: isDark ? '#1f1f1f' : '#fff' }]}>
+              <Text style={[styles.welcomeText, { color: isDark ? '#fff' : '#222' }]}>
+                أهلاً بيك مرة تانيه يا {user?.name}
+              </Text>
+              <Pressable onPress={() => dispatch(logout())} style={[styles.logoutButton, { backgroundColor: isDark ? '#333' : '#f5f5f5' }]}>
+                <Ionicons name="log-out-outline" size={28} color={isDark ? '#ff5252' : '#d32f2f'} />
+              </Pressable>
+            </View>
           )}
         </View>
 
         <View style={{ marginBottom: 100 }}>
           <ActivityCard onPress={() => console.log('Activity card pressed!')} />
-          <Text style={styles.header}>{i18n.t('discover_more')}</Text>
+          <Text style={[styles.header, { color: isDark ? '#fff' : '#222' }]}>{i18n.t('discover_more')}</Text>
           <MoreItem icon="person-circle-outline" title={i18n.t('profile')} onPress={() => {}} iconOpacity={0.4} />
-          <MoreItem icon="settings-outline" title={i18n.t('settings')} onPress={() => {}} iconOpacity={0.4} />
+          <MoreItem
+            icon="settings-outline"
+            title={i18n.t('settings')}
+            iconOpacity={0.4}
+            onPress={() => router.push("/updateUser")}
+          />
           <MoreItem icon="notifications-outline" title={i18n.t('notifications')} onPress={() => {}} iconOpacity={0.4} />
           <MoreItem icon="language-outline" title={i18n.t('language')} onPress={() => setLanguageModalVisible(true)} iconOpacity={0.4} />
           <MoreItem icon="newspaper-outline" title={i18n.t('blog')} onPress={() => {}} iconOpacity={0.4} />
           <MoreItem icon="call-outline" title={i18n.t('contact')} onPress={() => {}} iconOpacity={0.4} />
           <MoreItem icon="information-circle-outline" title={i18n.t('about')} onPress={() => {}} iconOpacity={0.4} />
           <MoreItem icon="shield-checkmark-outline" title={i18n.t('privacy')} onPress={() => {}} iconOpacity={0.4} />
+          <MoreItem icon="log-out-outline" title={i18n.t('log_out')} onPress={() => dispatch(logout())} iconOpacity={0.4} />
         </View>
 
         {/* Modal اختيار اللغة */}
         <Modal visible={languageModalVisible} transparent animationType="slide" onRequestClose={() => setLanguageModalVisible(false)}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{i18n.t('select_language')}</Text>
+          <View style={[styles.modalContainer, { backgroundColor: 'rgba(0,0,0,0.3)' }]}>
+            <View style={[styles.modalContent, { backgroundColor: isDark ? '#222' : '#F7F8FA' }]}>
+              <Text style={[styles.modalTitle, { color: isDark ? '#fff' : '#1F1F1F' }]}>{i18n.t('select_language')}</Text>
 
               {(['en', 'ar'] as const).map((lang) => (
                 <Pressable
                   key={lang}
                   onPress={() => changeLanguage(lang)}
-                  style={[styles.langButton, selectedLang === lang && styles.langButtonSelected]}
+                  style={[styles.langButton, selectedLang === lang && styles.langButtonSelected, { backgroundColor: selectedLang === lang ? '#4A90E2' : isDark ? '#333' : '#E0E4FF' }]}
                 >
-                  <Text style={[styles.langText, selectedLang === lang && styles.langTextSelected]}>
+                  <Text style={[styles.langText, selectedLang === lang && styles.langTextSelected, { color: selectedLang === lang ? '#fff' : isDark ? '#fff' : '#1F1F1F' }]}>
                     {lang === 'en' ? 'English' : 'العربية'}
                   </Text>
                 </Pressable>
@@ -147,4 +167,8 @@ const styles = StyleSheet.create({
   langButtonSelected: { backgroundColor: '#4A90E2' },
   langTextSelected: { color: '#fff', fontWeight: '600' },
   closeButton: { marginTop: 20, paddingVertical: 12, paddingHorizontal: 40, borderRadius: 20, borderWidth: 1, borderColor: '#4A90E2', backgroundColor: '#fff' },
+  loggedInContainer: { borderColor:'grey',borderWidth:0.5,flexDirection: 'row', alignItems: 'center', marginTop: -20, justifyContent: 'center', backgroundColor: '#fff', paddingLeft: 20, paddingRight: 20, borderRadius: 25 },
+  welcomeText: { fontSize: 16, fontWeight: '600', marginRight: 10, color: '#222' },
+  logoutButton: { padding: 4, borderRadius: 8, backgroundColor: '#f5f5f5' },
+
 });

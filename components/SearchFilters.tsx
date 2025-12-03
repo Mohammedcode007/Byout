@@ -5,7 +5,7 @@ import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useMemo, useRef, useState } from 'react';
-import { I18nManager, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { I18nManager, Pressable, ScrollView, StyleSheet, Text, TextInput, useColorScheme, View } from 'react-native';
 import { Portal } from 'react-native-paper';
 import MultiWordTagBox from './MultiWordTagBox';
 import TagBox from './TagBox';
@@ -48,6 +48,11 @@ const housingOptions = {
 
 
 export default function SearchFilters({ onFilterPress, onClearFilters }: Props) {
+   const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
+  const subTextColor = isDark ? '#ccc' : 'black';
+
+  const backgroundColor = isDark ? '#121212' : '#fff';
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [singleSelectWord, setSingleSelectWord] = useState<string | null>(null);
   const [currentBottomSheet, setCurrentBottomSheet] = useState<string | null>(null);
@@ -130,7 +135,7 @@ export default function SearchFilters({ onFilterPress, onClearFilters }: Props) 
   };
 
   return (
-    <View style={{ justifyContent: 'flex-start', backgroundColor: '#fff'}}>
+    <View style={{ justifyContent: 'flex-start', backgroundColor: backgroundColor}}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}

@@ -118,6 +118,7 @@
 //   },
 // });
 
+import LoadingOverlay from '@/components/LoadingOverlay';
 import { useAppDispatch, useAppSelector } from '@/hooks/useAuth';
 import { login } from '@/store/authSlice';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -202,6 +203,8 @@ export default function LoginScreen() {
       <Button
         mode="contained"
         onPress={handleLogin}
+                  labelStyle={{ color: '#fff' }} // هنا تحدد لون النص
+
         style={[styles.button, { backgroundColor: colors.button }]}
         loading={loading}
         disabled={loading}
@@ -224,6 +227,8 @@ export default function LoginScreen() {
       >
         {snackbarMessage}
       </Snackbar>
+            <LoadingOverlay visible={loading} />
+      
     </ScrollView>
   );
 }

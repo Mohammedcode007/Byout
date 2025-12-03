@@ -10,3 +10,24 @@ export const loginUser = async (data: { email: string; password: string }) => {
   const response = await axios.post(`${API_URL}/auth/login`, data);
   return response.data;
 };
+
+
+// 🔥 دالة تحديث بيانات المستخدم
+// تحديث بيانات المستخدم
+export const updateProfile = async (
+  token: string,
+  data: {
+    name?: string;
+    phone?: string;
+    oldPassword?: string;
+    newPassword?: string;
+  }
+) => {
+  const response = await axios.put(`${API_URL}/auth/update`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return response.data;
+};

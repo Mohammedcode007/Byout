@@ -1,6 +1,7 @@
-import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { Dimensions, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Image, Pressable, ScrollView, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import ContactButtons from './ContactButtons';
 
 const { width } = Dimensions.get('window');
 
@@ -33,11 +34,21 @@ const PropertyCard: React.FC<PropertyProps> = ({
       onPress, // ← استخدمناها هنا
 
 }) => {
-    const [liked, setLiked] = useState(false);
-    const [sliderValue, setSliderValue] = useState(priceRange.from);
+   const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
+
+  const [liked, setLiked] = useState(false);
+  const [sliderValue, setSliderValue] = useState(priceRange.from);
+
+  const textColor = isDark ? '#fff' : '#333';
+  const subTextColor = isDark ? '#ccc' : '#003366';
+  const backgroundColor = isDark ? '#1c1c1c' : '#fff';
+  const tagBackground = isDark ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.6)';
+  const contactBackground = isDark ? 'rgba(50, 50, 50, 0.7)' : 'rgba(217, 248, 217, 0.7)';
+  const infoTagBackground = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0, 122, 255, 0.15)';
 
     return (
-        <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { backgroundColor }]}>
             {/* Slider للصور */}
         <ScrollView
                 horizontal
@@ -78,68 +89,52 @@ const PropertyCard: React.FC<PropertyProps> = ({
           
 
             {/* معلومات العقار */}
-            <View style={[styles.infoRow, { justifyContent: 'flex-end' }]}>
-                <View style={styles.infoItem}>
-                    <Ionicons name="bed-outline" size={16} color="#444" />
-                    <Text style={styles.infoText}>{beds}</Text>
-                </View>
-                <View style={styles.infoItem}>
-                    <Ionicons name="water-outline" size={16} color="#444" />
-                    <Text style={styles.infoText}>{baths}</Text>
-                </View>
-                <View style={styles.infoItem}>
-                    <Ionicons name="resize-outline" size={16} color="#444" />
-                    <Text style={styles.infoText}>{area} م²</Text>
-                </View>
-            </View>
+        <View style={[styles.infoRow, { justifyContent: 'flex-end' }]}>
+        <View style={styles.infoItem}>
+          <Ionicons name="bed-outline" size={16} color={textColor} />
+          <Text style={[styles.infoText, { color: textColor }]}>{beds}</Text>
+        </View>
+        <View style={styles.infoItem}>
+          <Ionicons name="water-outline" size={16} color={textColor} />
+          <Text style={[styles.infoText, { color: textColor }]}>{baths}</Text>
+        </View>
+        <View style={styles.infoItem}>
+          <Ionicons name="resize-outline" size={16} color={textColor} />
+          <Text style={[styles.infoText, { color: textColor }]}>{area} م²</Text>
+        </View>
+      </View>
 
-            {/* وصف */}
-            <Text style={{ marginVertical: 10, textAlign: 'right' }}>{description}</Text>
+             {/* وصف */}
+      <Text style={{ marginVertical: 10, textAlign: 'right', color: textColor }}>{description}</Text>
 
-            {/* عنوان */}
-            <Text style={{ fontWeight: '700', fontSize: 16, textAlign: 'right' }}>{title}</Text>
+      {/* عنوان */}
+      <Text style={{ fontWeight: '700', fontSize: 16, textAlign: 'right', color: textColor }}>{title}</Text>
 
             {/* التسليم والمقدم والسعر */}
-  <View style={{ 
-    flexDirection: "column",
-    alignItems: "flex-end",
-    marginTop: 10
-}}>
-    {/* التسليم */}
-    <View style={styles.infoTagRow}>
-        <Ionicons name="calendar-outline" size={14} color="#003366" style={{ marginLeft: 4 }} />
-        <Text style={styles.infoTagText}>التسليم: {deliveryDate}</Text>
-    </View>
-
-    {/* المقدم */}
-    <View style={styles.infoTagRow}>
-        <Ionicons name="cash-outline" size={14} color="#003366" style={{ marginLeft: 4 }} />
-        <Text style={styles.infoTagText}>مقدم: {advance}</Text>
-    </View>
-
-    {/* السعر */}
-    <View style={styles.infoTagRow}>
-        <Ionicons name="pricetag-outline" size={14} color="#003366" style={{ marginLeft: 4 }} />
-        <Text style={styles.infoTagText}>السعر: {sliderValue} جنيه</Text>
-    </View>
-</View>
+ <View style={{ flexDirection: 'column', alignItems: 'flex-end', marginTop: 10 }}>
+        <View style={[styles.infoTagRow, { backgroundColor: infoTagBackground }]}>
+          <Ionicons name="calendar-outline" size={14} color={subTextColor} style={{ marginLeft: 4 }} />
+          <Text style={[styles.infoTagText, { color: subTextColor }]}>التسليم: {deliveryDate}</Text>
+        </View>
+        <View style={[styles.infoTagRow, { backgroundColor: infoTagBackground }]}>
+          <Ionicons name="cash-outline" size={14} color={subTextColor} style={{ marginLeft: 4 }} />
+          <Text style={[styles.infoTagText, { color: subTextColor }]}>مقدم: {advance}</Text>
+        </View>
+        <View style={[styles.infoTagRow, { backgroundColor: infoTagBackground }]}>
+          <Ionicons name="pricetag-outline" size={14} color={subTextColor} style={{ marginLeft: 4 }} />
+          <Text style={[styles.infoTagText, { color: subTextColor }]}>السعر: {sliderValue} جنيه</Text>
+        </View>
+      </View>
 
 
-            {/* 3 تواصل */}
-            <View style={[styles.infoRow, { marginTop: 10, justifyContent: 'center' }]}>
-                <Pressable style={styles.contactTag}>
-                    <Ionicons name="mail-outline" size={16} color="#003366" />
-                    <Text style={styles.contactText}>إيميل</Text>
-                </Pressable>
-                <Pressable style={styles.contactTag}>
-                    <Ionicons name="call-outline" size={16} color="#003366" />
-                    <Text style={styles.contactText}>اتصال</Text>
-                </Pressable>
-                <Pressable style={styles.contactTag}>
-                    <FontAwesome name="whatsapp" size={16} color="#003366" />
-                    <Text style={styles.contactText}>واتساب</Text>
-                </Pressable>
-            </View>
+    <ContactButtons
+  subTextColor={subTextColor}
+  contactBackground={contactBackground}
+  onPressEmail={() => console.log('Email pressed')}
+  onPressCall={() => console.log('Call pressed')}
+  onPressWhatsApp={() => console.log('WhatsApp pressed')}
+/>
+
         </ScrollView>
     );
 };

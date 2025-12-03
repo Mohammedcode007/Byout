@@ -83,6 +83,7 @@ i18n.translations = {
     privacy: "Privacy Policy",
     discover_more: "Discover More About Beit",
     select_language: "Select Language",
+    log_out:"Log out",
   },
   ar: {
     profile: "الملف الشخصي",
@@ -95,6 +96,8 @@ i18n.translations = {
     privacy: "سياسات الخصوصية",
     discover_more: "اكتشف المزيد عن بيوت",
     select_language: "اختر اللغة",
+        log_out:"تسجيل خروج",
+
   },
 };
 

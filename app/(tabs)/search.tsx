@@ -1,13 +1,17 @@
+
+
 // import LocationBar from '@/components/LocationBar';
 // import PropertyCard from '@/components/PropertyCard';
 // import SearchFilters from '@/components/SearchFilters';
+// import { useRouter } from 'expo-router';
 // import { useState } from 'react';
-// import { View } from 'react-native';
-// import { ScrollView } from 'react-native-gesture-handler';
+// import { ScrollView, View } from 'react-native';
 // import { SafeAreaView } from 'react-native-safe-area-context';
 
 // export default function SearchScreen() {
+//   const router = useRouter();
 //   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
 //   const properties = [
 //     {
 //       id: 1,
@@ -42,8 +46,16 @@
 //       tags: ['مميز'],
 //     },
 //   ];
+
+//   const handleCardPress = (property: typeof properties[0]) => {
+//     // نمرر id أو كامل البيانات حسب الحاجة
+//     router.push({
+//       pathname: '/property/[id]', // صفحة التفاصيل
+//       params: { id: property.id.toString() },
+//     });
+//   };
+
 //   return (
-    
 //     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
 //       {/* شريط الموقع */}
 //       <LocationBar
@@ -52,35 +64,34 @@
 //       />
 
 //       {/* الفلاتر */}
-//     <View 
-// >
-//     <SearchFilters
-//       onFilterPress={(label) => console.log("اخترت:", label)}
-//       onClearFilters={() => console.log("تم مسح الفلاتر")}
-//     />
-//   </View>
+//       <View>
+//         <SearchFilters
+//           onFilterPress={(label) => console.log("اخترت:", label)}
+//           onClearFilters={() => console.log("تم مسح الفلاتر")}
+//         />
+//       </View>
 
-//       {/* ScrollView ياخد باقي المساحة */}
-//         <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 50, }}>
-//           {properties.map((property) => (
-//             <View key={property.id} style={{ marginBottom: 20 }}>
-//               <PropertyCard
-//                 images={property.images}
-//                 priceRange={property.priceRange}
-//                 beds={property.beds}
-//                 baths={property.baths}
-//                 area={property.area}
-//                 description={property.description}
-//                 title={property.title}
-//                 deliveryDate={property.deliveryDate}
-//                 advance={property.advance}
-//                 tags={property.tags}
-//               />
-//             </View>
-//           ))}
-//         </ScrollView>
+//       {/* قائمة العقارات */}
+//       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 50 }}>
+//         {properties.map((property) => (
+//           <View key={property.id} style={{ marginBottom: 20 }}>
+//             <PropertyCard
+//               images={property.images}
+//               priceRange={property.priceRange}
+//               beds={property.beds}
+//               baths={property.baths}
+//               area={property.area}
+//               description={property.description}
+//               title={property.title}
+//               deliveryDate={property.deliveryDate}
+//               advance={property.advance}
+//               tags={property.tags}
+//               onPress={() => handleCardPress(property)} // عند الضغط
+//             />
+//           </View>
+//         ))}
+//       </ScrollView>
 //     </SafeAreaView>
-
 //   );
 // }
 
@@ -89,12 +100,16 @@ import PropertyCard from '@/components/PropertyCard';
 import SearchFilters from '@/components/SearchFilters';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, View, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SearchScreen() {
   const router = useRouter();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
+
+  const backgroundColor = isDark ? '#121212' : '#fff';
 
   const properties = [
     {
@@ -132,15 +147,14 @@ export default function SearchScreen() {
   ];
 
   const handleCardPress = (property: typeof properties[0]) => {
-    // نمرر id أو كامل البيانات حسب الحاجة
     router.push({
-      pathname: '/property/[id]', // صفحة التفاصيل
+      pathname: '/property/[id]',
       params: { id: property.id.toString() },
     });
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor }}>
       {/* شريط الموقع */}
       <LocationBar
         onSelectLocation={() => console.log("اختيار الموقع")}
@@ -170,7 +184,7 @@ export default function SearchScreen() {
               deliveryDate={property.deliveryDate}
               advance={property.advance}
               tags={property.tags}
-              onPress={() => handleCardPress(property)} // عند الضغط
+              onPress={() => handleCardPress(property)}
             />
           </View>
         ))}

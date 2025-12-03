@@ -1,7 +1,7 @@
 // components/LocationBar.tsx
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 
 interface Props {
   onSelectLocation?: () => void;
@@ -9,13 +9,20 @@ interface Props {
 }
 
 export default function LocationBar({ onSelectLocation, onSaveLocation }: Props) {
+   const colorScheme = useColorScheme();
+    const isDark = colorScheme === 'dark';
+    const subTextColor = isDark ? '#ccc' : 'black';
+  
+    const backgroundColor = isDark ? '#121212' : '#fff';
   return (
-    <View style={styles.locationBar}>
+    <View style={[styles.locationBar,{backgroundColor:backgroundColor}]}>
       
       {/* زر تحديد الموقع */}
       <Pressable style={styles.locationSection} onPress={onSelectLocation}>
         <Ionicons name="location-outline" size={22} color="#4A90E2" />
-        <Text style={styles.locationText}>حدد الموقع</Text>
+<Text style={[styles.locationText, { color: subTextColor }]}>
+  حدد الموقع
+</Text>
       </Pressable>
 
       {/* زر حفظ الموقع */}

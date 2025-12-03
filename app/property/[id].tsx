@@ -91,7 +91,7 @@ export default function PropertyDetailScreen() {
   <BottomSheetScrollView contentContainerStyle={{ padding: 16 }}>
     {/* العنوان والوصف */}
     <Text style={styles.title}>شقة للبيع في القاهرة</Text>
-    <Text style={styles.address}>العنوان: حي الزمالك، القاهرة</Text>  {/* ← هنا العنوان */}
+    <Text style={styles.address}>العنوان: حي الزمالك، القاهرة</Text>  
 
     <Text style={styles.description}>
       شقة رائعة بموقع ممتاز، قريبة من الخدمات، تصميم عصري، ومناسبة للعائلات.
