@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: 10,
+    borderRadius: 5,
     marginLeft: 5,
     flex: 1,
     justifyContent: 'center',
@@ -82,5 +82,7 @@ const styles = StyleSheet.create({
   contactText: {
     marginRight: 5,
     textAlign: 'right',
+    fontWeight:'bold',
+    fontSize:15
   },
 });

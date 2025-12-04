@@ -1,5 +1,7 @@
 
 
+import { useAppDispatch } from '@/hooks/useAuth';
+import { fetchProperties } from '@/store/propertieSlice';
 import { Ionicons } from '@expo/vector-icons';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
@@ -48,9 +50,10 @@ const housingOptions = {
 
 
 export default function SearchFilters({ onFilterPress, onClearFilters }: Props) {
-   const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const subTextColor = isDark ? '#ccc' : 'black';
+  const dispatch = useAppDispatch();
 
   const backgroundColor = isDark ? '#121212' : '#fff';
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
@@ -61,12 +64,15 @@ export default function SearchFilters({ onFilterPress, onClearFilters }: Props) 
   const [selectedHousingItem, setSelectedHousingItem] = useState<string | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
   const [selectedBath, setSelectedBath] = useState<string | null>(null); // الحمامات
+  console.log(selectedBath, 'selectedBath');
+
   const [fromPrice, setFromPrice] = useState(0);
   const [toPrice, setToPrice] = useState(10000);
   const [fromArea, setFromArea] = useState(0);
   const [toArea, setToArea] = useState(1000);
   const [paymentPlan, setPaymentPlan] = useState<string>(''); // تعريف state لخطة السداد
   const [completionPercent, setCompletionPercent] = useState<number>(0);
+  const [filters, setFilters] = useState<any>({});
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -134,8 +140,72 @@ export default function SearchFilters({ onFilterPress, onClearFilters }: Props) 
     onFilterPress?.(type);
   };
 
+
+const handleFilterPress = (
+  type: 'للبيع' | 'للايجار' | null,
+  bedrooms: string | null = null,
+  bathrooms: string | null = null,
+  price?: { from: number; to: number },
+  area?: { from: number; to: number }   // ← أضفنا مساحة اختيارية
+) => {
+  const newFilters: Record<string, any> = { ...filters };
+
+  if (type) newFilters.transactionType = type;
+  if (bedrooms) newFilters.bedrooms = bedrooms;
+  if (bathrooms) newFilters.bathroom = bathrooms;
+
+  // السعر
+  if (price) {
+    newFilters.price = { from: price.from, to: price.to };
+  } else {
+    newFilters.price = { from: fromPrice, to: toPrice };
+  }
+
+  // المساحة
+  if (area) {
+    newFilters.area = { from: area.from, to: area.to };
+  } else {
+    newFilters.area = { from: fromArea, to: toArea };
+  }
+
+  newFilters.type = selectedHousingItem;
+  newFilters.deliveryStatus = deliveryState;
+  newFilters.completion = completionPercent;
+  newFilters.paymentPlan = paymentPlan;
+
+  dispatch(fetchProperties(newFilters));
+};
+
+
+  // const handleFilterPress = (
+  //   type: 'للبيع' | 'للايجار' | null,
+  //   bedrooms: string | null = null,
+  //   bathrooms: string | null = null,
+  //   price?: { from: number; to: number }
+  // ) => {
+  //   const newFilters: Record<string, any> = { ...filters };
+
+  //   if (type) newFilters.transactionType = type;
+  //   if (bedrooms) newFilters.bedrooms = bedrooms;
+  //   if (bathrooms) newFilters.bathroom = bathrooms; // أضفنا الحمامات
+
+  //   if (price) {
+  //     newFilters.price = { from: price.from, to: price.to };
+  //   } else {
+  //     newFilters.price = { from: fromPrice, to: toPrice };
+  //   }
+
+  //   newFilters.area = { from: fromArea, to: toArea };
+  //   newFilters.type = selectedHousingItem;
+  //   newFilters.deliveryStatus = deliveryState;
+  //   newFilters.completion = completionPercent;
+  //   newFilters.paymentPlan = paymentPlan;
+
+  //   dispatch(fetchProperties(newFilters));
+  // };
+
   return (
-    <View style={{ justifyContent: 'flex-start', backgroundColor: backgroundColor}}>
+    <View style={{ justifyContent: 'flex-start', backgroundColor: backgroundColor }}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -147,7 +217,7 @@ export default function SearchFilters({ onFilterPress, onClearFilters }: Props) 
           <Ionicons name="filter-outline" size={24} color="#333" />
         </TagBox>
 
-        {/* فلتر للبيع */}
+        {/* فلتر sale */}
         <TagBox
           isSelected={selectedFilters.includes('للبيع') || selectedFilters.includes('للايجار')}
           onPress={() => toggleFilter('للبيع', true)}
@@ -189,7 +259,7 @@ export default function SearchFilters({ onFilterPress, onClearFilters }: Props) 
               isSelected={isSelected}
               onPress={() => toggleFilter(item.label!, hasBottomSheet)}
             >
-              <View style={{ flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row', alignItems: 'center'}}>
+              <View style={{ flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row', alignItems: 'center' }}>
                 {item.icon && <View style={{ marginHorizontal: 4 }}>{item.icon}</View>}
                 <Text style={{ fontSize: 14 }}>{item.label}</Text>
                 {!isSingleSelect && hasBottomSheet && item.label !== 'للبيع' && (
@@ -211,553 +281,575 @@ export default function SearchFilters({ onFilterPress, onClearFilters }: Props) 
       {/* BottomSheet */}
       <Portal>
 
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1} // مغلق في البداية
-        snapPoints={snapPoints}
-        enablePanDownToClose={true}
-        backgroundStyle={{ backgroundColor: '#fff', borderRadius: 16 }}
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={-1} // مغلق في البداية
+          snapPoints={snapPoints}
+          enablePanDownToClose={true}
+          backgroundStyle={{ backgroundColor: '#fff', borderRadius: 16 }}
 
-      >
-        <BottomSheetView style={{ padding: 16 }}>
-          {/* أيقونة الغلق */}
-          <Pressable
-            onPress={() => bottomSheetRef.current?.close()}
-            style={{ alignSelf: 'flex-end', marginBottom: 10 }}
-          >
-            <Ionicons name="close-outline" size={24} color="#333" />
-          </Pressable>
-          {currentBottomSheet === 'غرف النوم' && (
-            <View>
-              <Text style={{ fontWeight: '700', fontSize: 16, marginBottom: 10 }}>اختر عدد غرف النوم</Text>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
-                {['1', '2', '3', '4', '5', '6', '7', '8+', 'استديو'].map((room) => {
-                  const isSelected = selectedRoom === room;
-                  return (
+        >
+          <BottomSheetView style={{ padding: 16 }}>
+            {/* أيقونة الغلق */}
+            <Pressable
+              onPress={() => bottomSheetRef.current?.close()}
+              style={{ alignSelf: 'flex-end', marginBottom: 10 }}
+            >
+              <Ionicons name="close-outline" size={24} color="#333" />
+            </Pressable>
+            {currentBottomSheet === 'غرف النوم' && (
+              <View>
+                <Text style={{ fontWeight: '700', fontSize: 16, marginBottom: 10 }}>اختر عدد غرف النوم</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+                  {['1', '2', '3', '4', '5', '6', '7', '8+', 'استديو'].map((room) => {
+                    const isSelected = selectedRoom === room;
+                    return (
+                      <Pressable
+                        key={room}
+                        onPress={() => setSelectedRoom(room)}
+                        style={{
+                          paddingVertical: 8,
+                          paddingHorizontal: 14,
+                          borderRadius: 20,
+                          backgroundColor: isSelected ? '#d4f5d4' : '#f5f5f5',
+                          borderWidth: isSelected ? 2 : 0,
+                          borderColor: isSelected ? '#4CAF50' : 'transparent',
+                          margin: 4,
+                        }}
+                      >
+                        <Text style={{ fontSize: 14, textAlign: 'center' }}>{room}</Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+
+                <Pressable
+                  onPress={() => {
+                    if (selectedRoom) {
+                      setSelectedFilters(prev => {
+                        const cleaned = prev.filter(f => !['1', '2', '3', '4', '5', '6', '7', '8+', 'استديو'].includes(f));
+                        return [...cleaned, selectedRoom];
+                      });
+
+                      handleFilterPress(saleType, selectedRoom); // لن يتم ارسال البيع تلقائياً
+                    } else {
+                      handleFilterPress(saleType); // فقط النوع لو موجود
+                    }
+
+                    bottomSheetRef.current?.close();
+                    setCurrentBottomSheet(null);
+                  }}
+                  style={{ paddingVertical: 12, borderRadius: 8, alignItems: 'center' }}
+                >
+                  <Text style={{ color: 'green', fontWeight: '700' }}>تطبيق</Text>
+                </Pressable>
+
+              </View>
+            )}
+            {currentBottomSheet === 'سكني' && (
+              <View>
+                {/* زرين سكني / تجاري */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginBottom: 12 }}>
+                  {['سكني', 'تجاري'].map(type => (
                     <Pressable
-                      key={room}
-                      onPress={() => setSelectedRoom(room)}
-                      style={{
-                        paddingVertical: 8,
-                        paddingHorizontal: 14,
-                        borderRadius: 20,
-                        backgroundColor: isSelected ? '#d4f5d4' : '#f5f5f5',
-                        borderWidth: isSelected ? 2 : 0,
-                        borderColor: isSelected ? '#4CAF50' : 'transparent',
-                        margin: 4,
-                      }}
+                      key={type}
+                      onPress={() => setHousingType(type as 'سكني' | 'تجاري')}
+                      style={[
+                        styles.optionButton,
+                        housingType === type && styles.optionButtonSelected
+                      ]}
                     >
-                      <Text style={{ fontSize: 14, textAlign: 'center' }}>{room}</Text>
+                      <Text style={styles.optionText}>{type}</Text>
                     </Pressable>
-                  );
-                })}
+                  ))}
+                </View>
+
+                {/* قائمة المربعات الأفقية */}
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {housingOptions[housingType].map((item, idx) => {
+                    const isSelected = selectedHousingItem === item.label;
+
+                    return (
+                      <Pressable
+                        key={idx}
+                        onPress={() => {
+                          setSelectedHousingItem(item.label); // تحديد العنصر فقط
+                          onFilterPress?.(item.label); // إرسال الاختيار للفلتر الرئيسي
+                        }}
+                        style={{
+                          width: 80,
+                          height: 100,
+                          backgroundColor: isSelected ? '#d4f5d4' : '#f5f5f5', // تغيير اللون عند الاختيار
+                          borderRadius: 8,
+                          marginRight: 10,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: 6,
+                          borderWidth: isSelected ? 2 : 0,
+                          borderColor: isSelected ? '#4CAF50' : 'transparent',
+                        }}
+                      >
+                        {item.icon}
+                        <Text style={{ fontSize: 12, marginTop: 6, textAlign: 'center' }}>{item.label}</Text>
+                      </Pressable>
+                    );
+                  })}
+                </ScrollView>
               </View>
+            )}
+            {currentBottomSheet === 'الحمامات' && (
+              <View>
+                {/* أيقونة الحمام بدل النص */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                  <Ionicons name="water-outline" size={24} color="#444" />
+                  <Text style={{ fontSize: 16, fontWeight: '700', marginLeft: 8 }}>الحمامات</Text>
+                </View>
 
-              <Pressable
-                onPress={() => {
-                  if (selectedRoom) {
-                    // 1) حذف كل أرقام الغرف القديمة
-                    setSelectedFilters(prev => {
-                      const cleaned = prev.filter(f => !['1', '2', '3', '4', '5', '6', '7', '8+', 'استديو'].includes(f));
-                      return [...cleaned, selectedRoom];
-                    });
+                {currentBottomSheet === 'الحمامات' && (
+                  <View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                      <Ionicons name="water-outline" size={24} color="#444" />
+                      <Text style={{ fontSize: 16, fontWeight: '700', marginLeft: 8 }}>الحمامات</Text>
+                    </View>
 
-                    onFilterPress?.(selectedRoom);
-                  }
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+                      {['1', '2', '3', '4', '5', '6+'].map((bath) => {
+                        const isSelected = selectedBath === bath;
+                        return (
+                          <Pressable
+                            key={bath}
+                            onPress={() => setSelectedBath(bath)}
+                            style={{
+                              paddingVertical: 8,
+                              paddingHorizontal: 14,
+                              borderRadius: 20,
+                              backgroundColor: isSelected ? '#d4f5d4' : '#f5f5f5',
+                              borderWidth: isSelected ? 2 : 0,
+                              borderColor: isSelected ? '#4CAF50' : 'transparent',
+                              margin: 4,
+                            }}
+                          >
+                            <Text style={{ fontSize: 14, textAlign: 'center' }}>{bath}</Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
 
-                  bottomSheetRef.current?.close();
-                  setCurrentBottomSheet(null);
-                }}
-
-                style={{  paddingVertical: 12, borderRadius: 8, alignItems: 'center' }}
-              >
-                <Text style={{ color: 'green', fontWeight: '700' }}>تطبيق</Text>
-              </Pressable>
-            </View>
-          )}
-          {currentBottomSheet === 'سكني' && (
-            <View>
-              {/* زرين سكني / تجاري */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginBottom: 12 }}>
-                {['سكني', 'تجاري'].map(type => (
-                  <Pressable
-                    key={type}
-                    onPress={() => setHousingType(type as 'سكني' | 'تجاري')}
-                    style={[
-                      styles.optionButton,
-                      housingType === type && styles.optionButtonSelected
-                    ]}
-                  >
-                    <Text style={styles.optionText}>{type}</Text>
-                  </Pressable>
-                ))}
-              </View>
-
-              {/* قائمة المربعات الأفقية */}
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {housingOptions[housingType].map((item, idx) => {
-                  const isSelected = selectedHousingItem === item.label;
-
-                  return (
                     <Pressable
-                      key={idx}
                       onPress={() => {
-                        setSelectedHousingItem(item.label); // تحديد العنصر فقط
-                        onFilterPress?.(item.label); // إرسال الاختيار للفلتر الرئيسي
+                        handleFilterPress(saleType, selectedRoom, selectedBath);
+                        bottomSheetRef.current?.close();
+                        setCurrentBottomSheet(null);
                       }}
-                      style={{
-                        width: 80,
-                        height: 100,
-                        backgroundColor: isSelected ? '#d4f5d4' : '#f5f5f5', // تغيير اللون عند الاختيار
-                        borderRadius: 8,
-                        marginRight: 10,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: 6,
-                        borderWidth: isSelected ? 2 : 0,
-                        borderColor: isSelected ? '#4CAF50' : 'transparent',
-                      }}
+                      style={{ paddingVertical: 12, borderRadius: 8, alignItems: 'center' }}
                     >
-                      {item.icon}
-                      <Text style={{ fontSize: 12, marginTop: 6, textAlign: 'center' }}>{item.label}</Text>
+                      <Text style={{ color: 'green', fontWeight: '700' }}>تطبيق</Text>
                     </Pressable>
-                  );
-                })}
-              </ScrollView>
-            </View>
-          )}
-          {currentBottomSheet === 'الحمامات' && (
-            <View>
-              {/* أيقونة الحمام بدل النص */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-                <Ionicons name="water-outline" size={24} color="#444" />
-                <Text style={{ fontSize: 16, fontWeight: '700', marginLeft: 8 }}>الحمامات</Text>
-              </View>
+                  </View>
+                )}
 
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
-                {['1', '2', '3', '4', '5', '6+'].map((bath) => {
-                  const isSelected = selectedBath === bath; // state منفصل للحمامات
-                  return (
+
+
+              </View>
+            )}
+
+            {currentBottomSheet === 'السعر' && (
+              <View style={{ padding: 16 }}>
+                {/* أيقونة ونص */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                  <Ionicons name="pricetag-outline" size={24} color="#444" />
+                  <Text style={{ fontSize: 16, fontWeight: '700', marginLeft: 8 }}>نطاق السعر</Text>
+                </View>
+
+                {/* مستطيلين لإظهار القيم */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
+                  <TextInput
+                    style={styles.priceInput}
+                    keyboardType="numeric"
+                    value={fromPrice.toString()}
+                    onChangeText={(text) => {
+                      const val = Number(text);
+                      if (!isNaN(val) && val <= toPrice) setFromPrice(val);
+                    }}
+                  />
+                  <TextInput
+                    style={styles.priceInput}
+                    keyboardType="numeric"
+                    value={toPrice.toString()}
+                    onChangeText={(text) => {
+                      const val = Number(text);
+                      if (!isNaN(val) && val >= fromPrice) setToPrice(val);
+                    }}
+                  />
+                </View>
+
+                {/* Slider واحد مع نطاق مزدوج */}
+                <View style={{ marginBottom: 20 }}>
+                  <Text style={{ marginBottom: 8, color: '#555' }}>{`من ${fromPrice} إلى ${toPrice}`}</Text>
+
+                  <MultiSlider
+                    values={[fromPrice, toPrice]}
+                    min={0}
+                    max={10000}
+                    step={100}
+                    allowOverlap={false}
+                    snapped
+                    sliderLength={300} // أو اضبط حسب العرض المطلوب
+                    onValuesChange={(values) => {
+                      setFromPrice(values[0]);
+                      setToPrice(values[1]);
+                    }}
+                    selectedStyle={{ backgroundColor: '#4CAF50' }}
+                    unselectedStyle={{ backgroundColor: '#ccc' }}
+                    markerStyle={{ backgroundColor: '#4CAF50' }}
+                  />
+                </View>
+
+                {/* أزرار إعادة الضبط وتطبيق */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Pressable
+                    onPress={() => {
+                      setFromPrice(0);
+                      setToPrice(10000);
+                    }}
+                    style={[styles.actionButton,]}
+                  >
+                    <Text style={{ fontWeight: '700' }}>إعادة الضبط</Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => {
+                      onFilterPress?.(`${fromPrice} - ${toPrice}`); // حول الكائن لنص
+                      handleFilterPress(saleType, selectedRoom, `${fromPrice} - ${toPrice}`);
+                      bottomSheetRef.current?.close();
+                      setCurrentBottomSheet(null);
+                    }}
+                    style={[styles.actionButton]}
+                  >
+                    <Text style={{ color: 'green', fontWeight: '700' }}>تطبيق</Text>
+                  </Pressable>
+                </View>
+              </View>
+            )}
+            {currentBottomSheet === 'التسليم' && (
+              <View style={{ padding: 16 }}>
+                {/* أيقونة ونص */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                  <Ionicons name="calendar-outline" size={24} color="#444" />
+                  <Text style={{ fontSize: 16, fontWeight: '700', marginLeft: 8 }}>تاريخ التسليم</Text>
+                </View>
+
+                {/* اختيار الحالة */}
+                <View style={{ flexDirection: 'row', marginBottom: 16 }}>
+                  {['الجميع', 'جاهز', 'قيد الإعداد'].map((state) => (
                     <Pressable
-                      key={bath}
-                      onPress={() => setSelectedBath(bath)}
+                      key={state}
+                      onPress={() => {
+                        if (["الجميع", "جاهز", "قيد الإعداد"].includes(state)) {
+                          setDeliveryState(state as "الجميع" | "جاهز" | "قيد الإعداد");
+                        }
+                      }}
                       style={{
                         paddingVertical: 8,
                         paddingHorizontal: 14,
                         borderRadius: 20,
-                        backgroundColor: isSelected ? '#d4f5d4' : '#f5f5f5',
-                        borderWidth: isSelected ? 2 : 0,
-                        borderColor: isSelected ? '#4CAF50' : 'transparent',
-                        margin: 4,
+                        marginRight: 8,
+                        backgroundColor: deliveryState === state ? '#d4f5d4' : '#f5f5f5',
+                        borderWidth: deliveryState === state ? 2 : 0,
+                        borderColor: deliveryState === state ? '#4CAF50' : 'transparent',
                       }}
                     >
-                      <Text style={{ fontSize: 14, textAlign: 'center' }}>{bath}</Text>
+                      <Text>{state}</Text>
                     </Pressable>
-                  );
-                })}
-              </View>
+                  ))}
 
-              <Pressable
-                onPress={() => {
-                  if (selectedBath) {
-                    setSelectedFilters(prev => {
-                      const cleaned = prev.filter(f => !['1', '2', '3', '4', '5', '6+'].includes(f));
-                      return [...cleaned, selectedBath];
-                    });
-                    onFilterPress?.(selectedBath);
-                  }
+                </View>
 
-                  bottomSheetRef.current?.close();
-                  setCurrentBottomSheet(null);
-                }}
-                style={{ paddingVertical: 12, borderRadius: 8, alignItems: 'center' }}
-              >
-                <Text style={{ color: 'green', fontWeight: '700' }}>تطبيق</Text>
-              </Pressable>
-            </View>
-          )}
-
-          {currentBottomSheet === 'السعر' && (
-            <View style={{ padding: 16 }}>
-              {/* أيقونة ونص */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                <Ionicons name="pricetag-outline" size={24} color="#444" />
-                <Text style={{ fontSize: 16, fontWeight: '700', marginLeft: 8 }}>نطاق السعر</Text>
-              </View>
-
-              {/* مستطيلين لإظهار القيم */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
-                <TextInput
-                  style={styles.priceInput}
-                  keyboardType="numeric"
-                  value={fromPrice.toString()}
-                  onChangeText={(text) => {
-                    const val = Number(text);
-                    if (!isNaN(val) && val <= toPrice) setFromPrice(val);
-                  }}
-                />
-                <TextInput
-                  style={styles.priceInput}
-                  keyboardType="numeric"
-                  value={toPrice.toString()}
-                  onChangeText={(text) => {
-                    const val = Number(text);
-                    if (!isNaN(val) && val >= fromPrice) setToPrice(val);
-                  }}
-                />
-              </View>
-
-              {/* Slider واحد مع نطاق مزدوج */}
-              <View style={{ marginBottom: 20 }}>
-                <Text style={{ marginBottom: 8, color: '#555' }}>{`من ${fromPrice} إلى ${toPrice}`}</Text>
-
-                <MultiSlider
-                  values={[fromPrice, toPrice]}
-                  min={0}
-                  max={10000}
-                  step={100}
-                  allowOverlap={false}
-                  snapped
-                  sliderLength={300} // أو اضبط حسب العرض المطلوب
-                  onValuesChange={(values) => {
-                    setFromPrice(values[0]);
-                    setToPrice(values[1]);
-                  }}
-                  selectedStyle={{ backgroundColor: '#4CAF50' }}
-                  unselectedStyle={{ backgroundColor: '#ccc' }}
-                  markerStyle={{ backgroundColor: '#4CAF50' }}
-                />
-              </View>
-
-              {/* أزرار إعادة الضبط وتطبيق */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Pressable
-                  onPress={() => {
-                    setFromPrice(0);
-                    setToPrice(10000);
-                  }}
-                  style={[styles.actionButton,]}
-                >
-                  <Text style={{ fontWeight: '700' }}>إعادة الضبط</Text>
-                </Pressable>
-
-                <Pressable
-                  onPress={() => {
-                    onFilterPress?.(`${fromPrice} - ${toPrice}`);
-                    bottomSheetRef.current?.close();
-                    setCurrentBottomSheet(null);
-                  }}
-                  style={[styles.actionButton]}
-                >
-                  <Text style={{ color: 'green', fontWeight: '700' }}>تطبيق</Text>
-                </Pressable>
-              </View>
-            </View>
-          )}
-          {currentBottomSheet === 'التسليم' && (
-            <View style={{ padding: 16 }}>
-              {/* أيقونة ونص */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                <Ionicons name="calendar-outline" size={24} color="#444" />
-                <Text style={{ fontSize: 16, fontWeight: '700', marginLeft: 8 }}>تاريخ التسليم</Text>
-              </View>
-
-              {/* اختيار الحالة */}
-              <View style={{ flexDirection: 'row', marginBottom: 16 }}>
-                {['الجميع', 'جاهز', 'قيد الإعداد'].map((state) => (
+                {/* اختيار التاريخ */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
                   <Pressable
-                    key={state}
+                    onPress={() => setShowDatePicker(true)}
+                    style={[styles.dateInput, { flex: 1, justifyContent: 'center', padding: 12 }]}
+                  >
+                    <Text style={{ color: selectedDate ? '#000' : '#888', fontWeight: '500' }}>
+                      {selectedDate ? `${selectedDate.getMonth() + 1} / ${selectedDate.getFullYear()}` : 'اختر الشهر والسنة'}
+                    </Text>
+                  </Pressable>
+
+                  {/* زر إعادة الضبط */}
+                  <Pressable
                     onPress={() => {
-                      if (["الجميع", "جاهز", "قيد الإعداد"].includes(state)) {
-                        setDeliveryState(state as "الجميع" | "جاهز" | "قيد الإعداد");
-                      }
+                      setSelectedDate(null);
+                      setDeliveryState('الجميع');
                     }}
-                    style={{
-                      paddingVertical: 8,
-                      paddingHorizontal: 14,
-                      borderRadius: 20,
-                      marginRight: 8,
-                      backgroundColor: deliveryState === state ? '#d4f5d4' : '#f5f5f5',
-                      borderWidth: deliveryState === state ? 2 : 0,
-                      borderColor: deliveryState === state ? '#4CAF50' : 'transparent',
-                    }}
+                    style={[styles.actionButton, { backgroundColor: '#ccc', marginLeft: 10, paddingHorizontal: 12 }]}
                   >
-                    <Text>{state}</Text>
+                    <Text style={{ fontWeight: '700' }}>إعادة الضبط</Text>
                   </Pressable>
-                ))}
+                </View>
 
-              </View>
+                {/* DateTimePicker */}
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={selectedDate || new Date()}
+                    mode="date"
+                    display="spinner"
+                    onChange={(event, date) => {
+                      setShowDatePicker(false);
+                      if (date) setSelectedDate(date);
+                    }}
+                  />
+                )}
 
-              {/* اختيار التاريخ */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-                <Pressable
-                  onPress={() => setShowDatePicker(true)}
-                  style={[styles.dateInput, { flex: 1, justifyContent: 'center', padding: 12 }]}
-                >
-                  <Text style={{ color: selectedDate ? '#000' : '#888', fontWeight: '500' }}>
-                    {selectedDate ? `${selectedDate.getMonth() + 1} / ${selectedDate.getFullYear()}` : 'اختر الشهر والسنة'}
-                  </Text>
-                </Pressable>
-
-                {/* زر إعادة الضبط */}
+                {/* زر تطبيق */}
                 <Pressable
                   onPress={() => {
-                    setSelectedDate(null);
-                    setDeliveryState('الجميع');
+                    const stateText = deliveryState !== 'الجميع' ? ` - ${deliveryState}` : '';
+                    onFilterPress?.(
+                      selectedDate
+                        ? `${selectedDate.getMonth() + 1} / ${selectedDate.getFullYear()}${stateText}`
+                        : stateText
+                    );
+                    bottomSheetRef.current?.close();
+                    setCurrentBottomSheet(null);
                   }}
-                  style={[styles.actionButton, { backgroundColor: '#ccc', marginLeft: 10, paddingHorizontal: 12 }]}
+                  style={[styles.actionButton, { backgroundColor: '#4CAF50', marginTop: 20 }]}
                 >
-                  <Text style={{ fontWeight: '700' }}>إعادة الضبط</Text>
+                  <Text style={{ color: '#fff', fontWeight: '700', textAlign: 'center' }}>تطبيق</Text>
                 </Pressable>
               </View>
+            )}
 
-              {/* DateTimePicker */}
-              {showDatePicker && (
-                <DateTimePicker
-                  value={selectedDate || new Date()}
-                  mode="date"
-                  display="spinner"
-                  onChange={(event, date) => {
-                    setShowDatePicker(false);
-                    if (date) setSelectedDate(date);
-                  }}
-                />
-              )}
+            {currentBottomSheet === 'المساحة' && (
+              <View style={{ padding: 16 }}>
+                {/* أيقونة ونص */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                  <Ionicons name="resize-outline" size={24} color="#444" />
+                  <Text style={{ fontSize: 16, fontWeight: '700', marginLeft: 8 }}>نطاق المساحة (م²)</Text>
+                </View>
 
-              {/* زر تطبيق */}
-              <Pressable
-                onPress={() => {
-                  const stateText = deliveryState !== 'الجميع' ? ` - ${deliveryState}` : '';
-                  onFilterPress?.(
-                    selectedDate
-                      ? `${selectedDate.getMonth() + 1} / ${selectedDate.getFullYear()}${stateText}`
-                      : stateText
-                  );
-                  bottomSheetRef.current?.close();
-                  setCurrentBottomSheet(null);
-                }}
-                style={[styles.actionButton, { backgroundColor: '#4CAF50', marginTop: 20 }]}
-              >
-                <Text style={{ color: '#fff', fontWeight: '700', textAlign: 'center' }}>تطبيق</Text>
-              </Pressable>
-            </View>
-          )}
+                {/* مستطيلين لإظهار القيم */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
+                  <TextInput
+                    style={styles.priceInput}
+                    keyboardType="numeric"
+                    value={fromArea.toString()}
+                    onChangeText={(text) => {
+                      const val = Number(text);
+                      if (!isNaN(val) && val <= toArea) setFromArea(val);
+                    }}
+                  />
+                  <TextInput
+                    style={styles.priceInput}
+                    keyboardType="numeric"
+                    value={toArea.toString()}
+                    onChangeText={(text) => {
+                      const val = Number(text);
+                      if (!isNaN(val) && val >= fromArea) setToArea(val);
+                    }}
+                  />
+                </View>
 
-          {currentBottomSheet === 'المساحة' && (
-            <View style={{ padding: 16 }}>
-              {/* أيقونة ونص */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                <Ionicons name="resize-outline" size={24} color="#444" />
-                <Text style={{ fontSize: 16, fontWeight: '700', marginLeft: 8 }}>نطاق المساحة (م²)</Text>
+                {/* Slider واحد مع نطاق مزدوج */}
+                <View style={{ marginBottom: 20 }}>
+                  <Text style={{ marginBottom: 8, color: '#555' }}>{`من ${fromArea} إلى ${toArea} م²`}</Text>
+
+                  <MultiSlider
+                    values={[fromArea, toArea]}
+                    min={0}
+                    max={1000} // أقصى مساحة ممكنة
+                    step={10}
+                    allowOverlap={false}
+                    snapped
+                    sliderLength={300} // أو اضبط حسب العرض المطلوب
+                    onValuesChange={(values) => {
+                      setFromArea(values[0]);
+                      setToArea(values[1]);
+                    }}
+                    selectedStyle={{ backgroundColor: '#4CAF50' }}
+                    unselectedStyle={{ backgroundColor: '#ccc' }}
+                    markerStyle={{ backgroundColor: '#4CAF50' }}
+                  />
+                </View>
+
+                {/* أزرار إعادة الضبط وتطبيق */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Pressable
+                    onPress={() => {
+                      setFromArea(0);
+                      setToArea(1000);
+                    }}
+                    style={[styles.actionButton]}
+                  >
+                    <Text style={{ fontWeight: '700' }}>إعادة الضبط</Text>
+                  </Pressable>
+
+                  <Pressable
+                   onPress={() => {
+    handleFilterPress(
+      saleType,
+      selectedRoom,
+      selectedBath,
+      { from: fromPrice, to: toPrice }, // السعر لو مستخدم
+      { from: fromArea, to: toArea }    // ← أضفنا هنا المساحة
+    );
+    bottomSheetRef.current?.close();
+    setCurrentBottomSheet(null);
+  }}
+                    style={[styles.actionButton]}
+                  >
+                    <Text style={{ color: 'green', fontWeight: '700' }}>تطبيق</Text>
+                  </Pressable>
+                </View>
               </View>
+            )}
 
-              {/* مستطيلين لإظهار القيم */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
-                <TextInput
-                  style={styles.priceInput}
-                  keyboardType="numeric"
-                  value={fromArea.toString()}
-                  onChangeText={(text) => {
-                    const val = Number(text);
-                    if (!isNaN(val) && val <= toArea) setFromArea(val);
-                  }}
-                />
-                <TextInput
-                  style={styles.priceInput}
-                  keyboardType="numeric"
-                  value={toArea.toString()}
-                  onChangeText={(text) => {
-                    const val = Number(text);
-                    if (!isNaN(val) && val >= fromArea) setToArea(val);
-                  }}
-                />
+            {currentBottomSheet === 'خطة السداد' && (
+              <View style={{ padding: 16 }}>
+                {/* أيقونة ونص */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                  <Ionicons name="card-outline" size={24} color="#444" />
+                  <Text style={{ fontSize: 16, fontWeight: '700', marginLeft: 8 }}>خطة السداد</Text>
+                </View>
+
+                {/* خيارات السداد */}
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 20 }}>
+                  {['دفعة واحدة', 'تقسيط 3 أشهر', 'تقسيط 6 أشهر', 'تقسيط 12 شهر'].map((plan) => (
+                    <Pressable
+                      key={plan}
+                      onPress={() => setPaymentPlan(plan as string)}
+                      style={{
+                        paddingVertical: 10,
+                        paddingHorizontal: 16,
+                        borderRadius: 20,
+                        marginRight: 8,
+                        marginBottom: 10,
+                        backgroundColor: paymentPlan === plan ? '#4CAF50' : '#f5f5f5',
+                      }}
+                    >
+                      <Text style={{ color: paymentPlan === plan ? '#fff' : '#444', fontWeight: '500' }}>{plan}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+
+                {/* أزرار إعادة الضبط وتطبيق */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Pressable
+                    onPress={() => setPaymentPlan('')}
+                    style={[styles.actionButton]}
+                  >
+                    <Text style={{ fontWeight: '700' }}>إعادة الضبط</Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => {
+                      onFilterPress?.(paymentPlan);
+                      bottomSheetRef.current?.close();
+                      setCurrentBottomSheet(null);
+                    }}
+                    style={[styles.actionButton]}
+                  >
+                    <Text style={{ color: 'green', fontWeight: '700' }}>تطبيق</Text>
+                  </Pressable>
+                </View>
               </View>
+            )}
 
-              {/* Slider واحد مع نطاق مزدوج */}
-              <View style={{ marginBottom: 20 }}>
-                <Text style={{ marginBottom: 8, color: '#555' }}>{`من ${fromArea} إلى ${toArea} م²`}</Text>
+            {currentBottomSheet === 'اكتمال' && (
+              <View style={{ padding: 16 }}>
+                {/* أيقونة ونص */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                  <Ionicons name="pie-chart-outline" size={24} color="#444" />
+                  <Text style={{ fontSize: 16, fontWeight: '700', marginLeft: 8 }}>نسبة الاكتمال</Text>
+                </View>
 
+                {/* مستطيل لإظهار القيمة */}
+                <View style={{ marginBottom: 16, alignItems: 'center' }}>
+                  <Text style={{ fontSize: 18, fontWeight: '700' }}>{completionPercent}%</Text>
+                </View>
+
+                {/* Slider للنسبة */}
                 <MultiSlider
-                  values={[fromArea, toArea]}
+                  values={[completionPercent]}
                   min={0}
-                  max={1000} // أقصى مساحة ممكنة
-                  step={10}
-                  allowOverlap={false}
-                  snapped
-                  sliderLength={300} // أو اضبط حسب العرض المطلوب
-                  onValuesChange={(values) => {
-                    setFromArea(values[0]);
-                    setToArea(values[1]);
-                  }}
+                  max={100}
+                  step={1}
+                  onValuesChange={(values) => setCompletionPercent(values[0])}
+                  sliderLength={300}
                   selectedStyle={{ backgroundColor: '#4CAF50' }}
                   unselectedStyle={{ backgroundColor: '#ccc' }}
                   markerStyle={{ backgroundColor: '#4CAF50' }}
                 />
-              </View>
 
-              {/* أزرار إعادة الضبط وتطبيق */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Pressable
-                  onPress={() => {
-                    setFromArea(0);
-                    setToArea(1000);
-                  }}
-                  style={[styles.actionButton]}
-                >
-                  <Text style={{ fontWeight: '700' }}>إعادة الضبط</Text>
-                </Pressable>
-
-                <Pressable
-                  onPress={() => {
-                    onFilterPress?.(`${fromArea} - ${toArea} م²`);
-                    bottomSheetRef.current?.close();
-                    setCurrentBottomSheet(null);
-                  }}
-                  style={[styles.actionButton]}
-                >
-                  <Text style={{ color: 'green', fontWeight: '700' }}>تطبيق</Text>
-                </Pressable>
-              </View>
-            </View>
-          )}
-
-          {currentBottomSheet === 'خطة السداد' && (
-            <View style={{ padding: 16 }}>
-              {/* أيقونة ونص */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                <Ionicons name="card-outline" size={24} color="#444" />
-                <Text style={{ fontSize: 16, fontWeight: '700', marginLeft: 8 }}>خطة السداد</Text>
-              </View>
-
-              {/* خيارات السداد */}
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 20 }}>
-                {['دفعة واحدة', 'تقسيط 3 أشهر', 'تقسيط 6 أشهر', 'تقسيط 12 شهر'].map((plan) => (
+                {/* أزرار إعادة الضبط وتطبيق */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
                   <Pressable
-                    key={plan}
-                    onPress={() => setPaymentPlan(plan as string)}
+                    onPress={() => setCompletionPercent(0)}
+                    style={[styles.actionButton,]}
+                  >
+                    <Text style={{ fontWeight: '700' }}>إعادة الضبط</Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => {
+                      onFilterPress?.(`${completionPercent}%`);
+                      bottomSheetRef.current?.close();
+                      setCurrentBottomSheet(null);
+                    }}
                     style={{
-                      paddingVertical: 10,
-                      paddingHorizontal: 16,
-                      borderRadius: 20,
-                      marginRight: 8,
-                      marginBottom: 10,
-                      backgroundColor: paymentPlan === plan ? '#4CAF50' : '#f5f5f5',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      paddingHorizontal: 20,
+                      borderRadius: 12,
                     }}
                   >
-                    <Text style={{ color: paymentPlan === plan ? '#fff' : '#444', fontWeight: '500' }}>{plan}</Text>
+                    {/* أيقونة داخل الزرار */}
+                    <Ionicons name="checkmark-circle-outline" size={20} color="green" style={{ marginRight: 8 }} />
+
+                    {/* النص */}
+                    <Text style={{ color: 'green', fontWeight: '700', fontSize: 16 }}>تطبيق</Text>
                   </Pressable>
-                ))}
-              </View>
 
-              {/* أزرار إعادة الضبط وتطبيق */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                </View>
+              </View>
+            )}
+            {/* محتوى البيع/الإيجار أو محتوى الفلتر */}
+            {currentBottomSheet === 'للبيع' && (
+              <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
                 <Pressable
-                  onPress={() => setPaymentPlan('')}
-                  style={[styles.actionButton]}
+                  onPress={() => {
+                    handleFilterPress('للبيع'); // تطبيق الفلتر مباشرة
+
+                    selectSaleType('للبيع')
+                  }}
+
+                  style={[
+                    styles.optionButton,
+                    saleType === 'للبيع' && styles.optionButtonSelected
+                  ]}
                 >
-                  <Text style={{ fontWeight: '700' }}>إعادة الضبط</Text>
+                  <Text style={styles.optionText}>للبيع</Text>
                 </Pressable>
 
                 <Pressable
                   onPress={() => {
-                    onFilterPress?.(paymentPlan);
-                    bottomSheetRef.current?.close();
-                    setCurrentBottomSheet(null);
+                    handleFilterPress('للايجار'); // تطبيق الفلتر مباشرة
+
+                    selectSaleType('للايجار')
                   }}
-                  style={[styles.actionButton]}
+                  style={[
+                    styles.optionButton,
+                    saleType === 'للايجار' && styles.optionButtonSelected
+                  ]}
                 >
-                  <Text style={{ color: 'green', fontWeight: '700' }}>تطبيق</Text>
+                  <Text style={styles.optionText}>للايجار</Text>
                 </Pressable>
               </View>
-            </View>
-          )}
+            )}
 
-          {currentBottomSheet === 'اكتمال' && (
-            <View style={{ padding: 16 }}>
-              {/* أيقونة ونص */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                <Ionicons name="pie-chart-outline" size={24} color="#444" />
-                <Text style={{ fontSize: 16, fontWeight: '700', marginLeft: 8 }}>نسبة الاكتمال</Text>
-              </View>
-
-              {/* مستطيل لإظهار القيمة */}
-              <View style={{ marginBottom: 16, alignItems: 'center' }}>
-                <Text style={{ fontSize: 18, fontWeight: '700' }}>{completionPercent}%</Text>
-              </View>
-
-              {/* Slider للنسبة */}
-              <MultiSlider
-                values={[completionPercent]}
-                min={0}
-                max={100}
-                step={1}
-                onValuesChange={(values) => setCompletionPercent(values[0])}
-                sliderLength={300}
-                selectedStyle={{ backgroundColor: '#4CAF50' }}
-                unselectedStyle={{ backgroundColor: '#ccc' }}
-                markerStyle={{ backgroundColor: '#4CAF50' }}
-              />
-
-              {/* أزرار إعادة الضبط وتطبيق */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
-                <Pressable
-                  onPress={() => setCompletionPercent(0)}
-                  style={[styles.actionButton,]}
-                >
-                  <Text style={{ fontWeight: '700' }}>إعادة الضبط</Text>
-                </Pressable>
-
-                <Pressable
-                  onPress={() => {
-                    onFilterPress?.(`${completionPercent}%`);
-                    bottomSheetRef.current?.close();
-                    setCurrentBottomSheet(null);
-                  }}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    paddingHorizontal: 20,
-                    borderRadius: 12,
-                  }}
-                >
-                  {/* أيقونة داخل الزرار */}
-                  <Ionicons name="checkmark-circle-outline" size={20} color="green" style={{ marginRight: 8 }} />
-
-                  {/* النص */}
-                  <Text style={{ color: 'green', fontWeight: '700', fontSize: 16 }}>تطبيق</Text>
-                </Pressable>
-
-              </View>
-            </View>
-          )}
-          {/* محتوى البيع/الإيجار أو محتوى الفلتر */}
-          {currentBottomSheet === 'للبيع' && (
-            <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-              <Pressable
-                onPress={() => selectSaleType('للبيع')}
-                style={[
-                  styles.optionButton,
-                  saleType === 'للبيع' && styles.optionButtonSelected
-                ]}
-              >
-                <Text style={styles.optionText}>للبيع</Text>
-              </Pressable>
-
-              <Pressable
-                onPress={() => selectSaleType('للايجار')}
-                style={[
-                  styles.optionButton,
-                  saleType === 'للايجار' && styles.optionButtonSelected
-                ]}
-              >
-                <Text style={styles.optionText}>للايجار</Text>
-              </Pressable>
-            </View>
-          )}
-
-        </BottomSheetView>
-      </BottomSheet>
+          </BottomSheetView>
+        </BottomSheet>
       </Portal>
 
     </View>

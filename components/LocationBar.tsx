@@ -11,7 +11,7 @@ interface Props {
 export default function LocationBar({ onSelectLocation, onSaveLocation }: Props) {
    const colorScheme = useColorScheme();
     const isDark = colorScheme === 'dark';
-    const subTextColor = isDark ? '#ccc' : 'black';
+    const subTextColor = isDark ? '#ccc' : '#00606b';
   
     const backgroundColor = isDark ? '#121212' : '#fff';
   return (
@@ -19,15 +19,15 @@ export default function LocationBar({ onSelectLocation, onSaveLocation }: Props)
       
       {/* زر تحديد الموقع */}
       <Pressable style={styles.locationSection} onPress={onSelectLocation}>
-        <Ionicons name="location-outline" size={22} color="#4A90E2" />
-<Text style={[styles.locationText, { color: subTextColor }]}>
+        <Ionicons name="location-outline" size={22} color="#00606b" />
+<Text style={[styles.locationText, { color: '#00606b' }]}>
   حدد الموقع
 </Text>
       </Pressable>
 
       {/* زر حفظ الموقع */}
       <Pressable style={styles.saveSection} onPress={onSaveLocation}>
-        <Ionicons name="bookmark-outline" size={22} color="#4A90E2" />
+        <Ionicons name="bookmark-outline" size={22} color="#00606b" />
         <Text style={styles.saveText}>حفظ الموقع</Text>
       </Pressable>
 
@@ -64,6 +64,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500',
     marginLeft: 6,
-    color: '#4A90E2',
+    color: '#00606b',
   },
 });

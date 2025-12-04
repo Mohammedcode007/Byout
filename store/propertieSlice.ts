@@ -1,9 +1,9 @@
 import {
-    addProperty,
-    deleteProperty,
-    getProperties,
-    getPropertyById,
-    updateProperty,
+  addProperty,
+  deleteProperty,
+  getProperties,
+  getPropertyById,
+  updateProperty,
 } from "@/services/propertieService";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
@@ -13,7 +13,7 @@ export type PropertyData = {
   title: string;
   description?: string;
   type: "apartment" | "villa" | "room" | "student_housing";
-  transactionType: "sale" | "rent";
+  transactionType: "للبيع" | "للايجار";
   price: number;
   advancePayment?: number;
   location: {

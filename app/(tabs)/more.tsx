@@ -97,7 +97,7 @@ const colorScheme = useColorScheme(); // 'light' أو 'dark'
               <Text style={[styles.welcomeText, { color: isDark ? '#fff' : '#222' }]}>
                 أهلاً بيك مرة تانيه يا {user?.name}
               </Text>
-              <Pressable onPress={() => dispatch(logout())} style={[styles.logoutButton, { backgroundColor: isDark ? '#333' : '#f5f5f5' }]}>
+              <Pressable onPress={handleLogout} style={[styles.logoutButton, { backgroundColor: isDark ? '#333' : '#f5f5f5' }]}>
                 <Ionicons name="log-out-outline" size={28} color={isDark ? '#ff5252' : '#d32f2f'} />
               </Pressable>
             </View>
@@ -120,7 +120,7 @@ const colorScheme = useColorScheme(); // 'light' أو 'dark'
           <MoreItem icon="call-outline" title={i18n.t('contact')} onPress={() => {}} iconOpacity={0.4} />
           <MoreItem icon="information-circle-outline" title={i18n.t('about')} onPress={() => {}} iconOpacity={0.4} />
           <MoreItem icon="shield-checkmark-outline" title={i18n.t('privacy')} onPress={() => {}} iconOpacity={0.4} />
-          <MoreItem icon="log-out-outline" title={i18n.t('log_out')} onPress={() => dispatch(logout())} iconOpacity={0.4} />
+          <MoreItem icon="log-out-outline" title={i18n.t('log_out')} onPress={handleLogout} iconOpacity={0.4} />
         </View>
 
         {/* Modal اختيار اللغة */}

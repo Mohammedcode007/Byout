@@ -1,167 +1,45 @@
 
-
-// import LocationBar from '@/components/LocationBar';
-// import PropertyCard from '@/components/PropertyCard';
-// import SearchFilters from '@/components/SearchFilters';
-// import { useRouter } from 'expo-router';
-// import { useState } from 'react';
-// import { ScrollView, View } from 'react-native';
-// import { SafeAreaView } from 'react-native-safe-area-context';
-
-// export default function SearchScreen() {
-//   const router = useRouter();
-//   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-
-//   const properties = [
-//     {
-//       id: 1,
-//       images: [
-//         'https://www.contemporist.com/wp-content/uploads/2017/05/modern-house-design-swimming-pool-160517-950-01-800x533.jpg',
-//         'https://res.cloudinary.com/stannard-homes/image/fetch/c_fill,g_auto,f_auto,dpr_auto,w_1170,h_617/https://stannard-homes-assets.s3.ap-southeast-2.amazonaws.com/app/uploads/2021/09/19134557/042.jpg',
-//       ],
-//       priceRange: { from: 1000, to: 5000 },
-//       beds: 3,
-//       baths: 2,
-//       area: 120,
-//       description: 'شقة رائعة بموقع ممتاز.',
-//       title: 'شقة للبيع في القاهرة',
-//       deliveryDate: '12/2025',
-//       advance: '200,000',
-//       tags: ['قيد الإنشاء', 'مميز'],
-//     },
-//     {
-//       id: 2,
-//       images: [
-//         'https://www.thithithara.com/storage/property/images/2656_image_1708220798.jpg',
-//         'https://futurestiles.com/wp-content/uploads/2024/11/Black-Elegant-Interior-Design-Presentation-2024-11-23T181925.075-2.jpg',
-//       ],
-//       priceRange: { from: 2000, to: 6000 },
-//       beds: 4,
-//       baths: 3,
-//       area: 180,
-//       description: 'فيلا فاخرة بالقرب من البحر.',
-//       title: 'فيلا للبيع في الإسكندرية',
-//       deliveryDate: '06/2026',
-//       advance: '500,000',
-//       tags: ['مميز'],
-//     },
-//   ];
-
-//   const handleCardPress = (property: typeof properties[0]) => {
-//     // نمرر id أو كامل البيانات حسب الحاجة
-//     router.push({
-//       pathname: '/property/[id]', // صفحة التفاصيل
-//       params: { id: property.id.toString() },
-//     });
-//   };
-
-//   return (
-//     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-//       {/* شريط الموقع */}
-//       <LocationBar
-//         onSelectLocation={() => console.log("اختيار الموقع")}
-//         onSaveLocation={() => console.log("تم حفظ الموقع")}
-//       />
-
-//       {/* الفلاتر */}
-//       <View>
-//         <SearchFilters
-//           onFilterPress={(label) => console.log("اخترت:", label)}
-//           onClearFilters={() => console.log("تم مسح الفلاتر")}
-//         />
-//       </View>
-
-//       {/* قائمة العقارات */}
-//       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 50 }}>
-//         {properties.map((property) => (
-//           <View key={property.id} style={{ marginBottom: 20 }}>
-//             <PropertyCard
-//               images={property.images}
-//               priceRange={property.priceRange}
-//               beds={property.beds}
-//               baths={property.baths}
-//               area={property.area}
-//               description={property.description}
-//               title={property.title}
-//               deliveryDate={property.deliveryDate}
-//               advance={property.advance}
-//               tags={property.tags}
-//               onPress={() => handleCardPress(property)} // عند الضغط
-//             />
-//           </View>
-//         ))}
-//       </ScrollView>
-//     </SafeAreaView>
-//   );
-// }
-
+import LoadingOverlay from '@/components/LoadingOverlay';
 import LocationBar from '@/components/LocationBar';
+import PropertyCard from '@/components/PropertyCard';
 import SearchFilters from '@/components/SearchFilters';
 import { useAppDispatch, useAppSelector } from '@/hooks/useAuth';
 import { fetchProperties } from '@/store/propertieSlice';
+import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { View, useColorScheme } from 'react-native';
+import { useCallback, useContext } from 'react';
+import { Animated, ScrollView, Text, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import { ScrollYContext } from './_layout';
 export default function SearchScreen() {
   const router = useRouter();
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-const dispatch = useAppDispatch();
-const { properties, loading, error } = useAppSelector((state) => state.property);
-console.log(properties);
-
-useEffect(() => {
-  dispatch(fetchProperties()); // لازم تستدعي الـ thunk هنا
-}, []);
   const backgroundColor = isDark ? '#121212' : '#fff';
+  const scrollY = useContext(ScrollYContext); // استخدم الـ scrollY من Context
 
-  // const properties = [
-  //   {
-  //     id: 1,
-  //     images: [
-  //       'https://www.contemporist.com/wp-content/uploads/2017/05/modern-house-design-swimming-pool-160517-950-01-800x533.jpg',
-  //       'https://res.cloudinary.com/stannard-homes/image/fetch/c_fill,g_auto,f_auto,dpr_auto,w_1170,h_617/https://stannard-homes-assets.s3.ap-southeast-2.amazonaws.com/app/uploads/2021/09/19134557/042.jpg',
-  //     ],
-  //     priceRange: { from: 1000, to: 5000 },
-  //     beds: 3,
-  //     baths: 2,
-  //     area: 120,
-  //     description: 'شقة رائعة بموقع ممتاز.',
-  //     title: 'شقة للبيع في القاهرة',
-  //     deliveryDate: '12/2025',
-  //     advance: '200,000',
-  //     tags: ['قيد الإنشاء', 'مميز'],
-  //   },
-  //   {
-  //     id: 2,
-  //     images: [
-  //       'https://www.thithithara.com/storage/property/images/2656_image_1708220798.jpg',
-  //       'https://futurestiles.com/wp-content/uploads/2024/11/Black-Elegant-Interior-Design-Presentation-2024-11-23T181925.075-2.jpg',
-  //     ],
-  //     priceRange: { from: 2000, to: 6000 },
-  //     beds: 4,
-  //     baths: 3,
-  //     area: 180,
-  //     description: 'فيلا فاخرة بالقرب من البحر.',
-  //     title: 'فيلا للبيع في الإسكندرية',
-  //     deliveryDate: '06/2026',
-  //     advance: '500,000',
-  //     tags: ['مميز'],
-  //   },
-  // ];
+  const dispatch = useAppDispatch();
+  const { properties, loading, error } = useAppSelector((state) => state.property);
 
-  // const handleCardPress = (property: typeof properties[0]) => {
-  //   router.push({
-  //     pathname: '/property/[id]',
-  //     params: { id: property.id.toString() },
-  //   });
-  // };
-
+  // useEffect(() => {
+  //   dispatch(fetchProperties());
+  // }, [dispatch]);
+useFocusEffect(
+  useCallback(() => {
+    dispatch(fetchProperties());
+  }, [dispatch])
+);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor }}>
+         <Animated.ScrollView
+              style={{ flex: 1, backgroundColor: isDark ? '#121212' : '#fff', paddingTop: 20 }}
+              onScroll={Animated.event(
+                [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                { useNativeDriver: true }
+              )}
+              scrollEventThrottle={16}
+            >
+
       {/* شريط الموقع */}
       <LocationBar
         onSelectLocation={() => console.log("اختيار الموقع")}
@@ -177,25 +55,52 @@ useEffect(() => {
       </View>
 
       {/* قائمة العقارات */}
-      {/* <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 50 }}>
-        {properties.map((property) => (
-          <View key={property.id} style={{ marginBottom: 20 }}>
-            <PropertyCard
-              images={property.images}
-              priceRange={property.priceRange}
-              beds={property.beds}
-              baths={property.baths}
-              area={property.area}
-              description={property.description}
-              title={property.title}
-              deliveryDate={property.deliveryDate}
-              advance={property.advance}
-              tags={property.tags}
-              onPress={() => handleCardPress(property)}
-            />
-          </View>
-        ))}
-      </ScrollView> */}
+      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 50 }}>
+        {/* Loading state */}
+      <LoadingOverlay visible={loading} />
+
+        {/* Error state */}
+        {error && <Text style={{ textAlign: 'center', marginTop: 50, color: 'red' }}>{error}</Text>}
+
+        {/* Empty state */}
+        {!loading && properties.length === 0 && (
+          <Text style={{ textAlign: 'center', marginTop: 50 }}>لا توجد عقارات</Text>
+        )}
+
+        {/* Render properties */}
+        {properties.map((property) => {
+          // تقسيم الصور لو كانت عبارة عن string مفصول بفواصل
+          const propertyImages = property.images?.[0]
+            ? property.images[0].includes(',')
+              ? property.images[0].split(',').map(img => img.trim())
+              : property.images
+            : [];
+
+          return (
+            <View key={property._id} style={{ marginBottom: 20 }}>
+              <PropertyCard
+                item={{
+                  ...property,
+                  images: propertyImages,
+                  bedrooms: property.bedrooms ?? 0,
+                  bathrooms: property.bathrooms ?? 0,
+                  area: property.area ?? 0,
+                  price: property.price ?? 0,
+                  deliveryDate: property.deliveryDate ?? new Date().toISOString(),
+                  advancePayment: property.advancePayment ?? 0,
+                  contact: {
+                    phone: property.contact?.phone ?? 'غير متوفر',
+                    email: property.contact?.email ?? 'غير متوفر',
+                  },
+                }}
+                onPress={() => router.push(`/property/${property._id}`)}
+              />
+            </View>
+          );
+        })}
+      </ScrollView>
+                  </Animated.ScrollView>
+
     </SafeAreaView>
   );
 }

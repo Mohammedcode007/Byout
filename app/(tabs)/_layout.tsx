@@ -291,7 +291,7 @@ const AnimatedTabIcon = ({
           backgroundColor: focused
             ? isDark
               ? 'rgba(108,92,231,0.25)'
-              : 'rgba(108,92,231,0.15)'
+              : '#cdf7e1ff'
             : 'transparent',
           borderRadius: 25,
         }}
@@ -310,7 +310,7 @@ const AnimatedTabIcon = ({
           <Ionicons
             name={displayIconName}
             size={18}
-            color={focused ? '#6c5ce7' : isDark ? '#fff' : '#333'}
+            color={focused ? '#00666d' : isDark ? '#fff' : '#333'}
           />
         </Animated.View>
 
@@ -318,7 +318,7 @@ const AnimatedTabIcon = ({
           style={{
             marginLeft: 4,
             opacity: fadeAnim,
-            color: '#6c5ce7',
+            color: '#00666d',
             fontSize: 10,
             fontWeight: '600',
           }}
