@@ -9,7 +9,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useMemo, useRef, useState } from 'react';
 import { I18nManager, Pressable, ScrollView, StyleSheet, Text, TextInput, useColorScheme, View } from 'react-native';
 import { Portal } from 'react-native-paper';
-import MultiWordTagBox from './MultiWordTagBox';
+import LocationFilter from './LocationFilter';
 import TagBox from './TagBox';
 
 interface Props {
@@ -64,16 +64,18 @@ export default function SearchFilters({ onFilterPress, onClearFilters }: Props) 
   const [selectedHousingItem, setSelectedHousingItem] = useState<string | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
   const [selectedBath, setSelectedBath] = useState<string | null>(null); // الحمامات
-  console.log(selectedBath, 'selectedBath');
 
-  const [fromPrice, setFromPrice] = useState(0);
-  const [toPrice, setToPrice] = useState(10000);
+  const [fromPrice, setFromPrice] = useState(0);           // الحد الأدنى
+  const [toPrice, setToPrice] = useState(100_000_000);    // الحد الأعلى (100 مليون)
+
   const [fromArea, setFromArea] = useState(0);
   const [toArea, setToArea] = useState(1000);
   const [paymentPlan, setPaymentPlan] = useState<string>(''); // تعريف state لخطة السداد
   const [completionPercent, setCompletionPercent] = useState<number>(0);
   const [filters, setFilters] = useState<any>({});
-
+  const [selectedCountry] = useState<string>('مصر'); // الدولة ثابتة
+  const [selectedCity, setSelectedCity] = useState<string>('');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -84,7 +86,7 @@ export default function SearchFilters({ onFilterPress, onClearFilters }: Props) 
 
 
 
-  const filtersWithBottomSheet = ["للبيع", "سكني", "المساحة", "غرف النوم", "السعر", "الحمامات", "التسليم", "خطة السداد", "اكتمال"];
+  const filtersWithBottomSheet = ["للبيع", "سكني", "المكان", "المساحة", "غرف النوم", "السعر", "الحمامات", "التسليم", "خطة السداد"];
   const openBottomSheet = (label: string) => {
     if (currentBottomSheet === label) {
       // لو نفس الفلتر اللي مفتوح، بس افتحه مرة تانية
@@ -139,70 +141,118 @@ export default function SearchFilters({ onFilterPress, onClearFilters }: Props) 
     bottomSheetRef.current?.close();
     onFilterPress?.(type);
   };
-
-
-const handleFilterPress = (
-  type: 'للبيع' | 'للايجار' | null,
-  bedrooms: string | null = null,
-  bathrooms: string | null = null,
-  price?: { from: number; to: number },
-  area?: { from: number; to: number }   // ← أضفنا مساحة اختيارية
-) => {
-  const newFilters: Record<string, any> = { ...filters };
-
-  if (type) newFilters.transactionType = type;
-  if (bedrooms) newFilters.bedrooms = bedrooms;
-  if (bathrooms) newFilters.bathroom = bathrooms;
-
-  // السعر
-  if (price) {
-    newFilters.price = { from: price.from, to: price.to };
-  } else {
-    newFilters.price = { from: fromPrice, to: toPrice };
-  }
-
-  // المساحة
-  if (area) {
-    newFilters.area = { from: area.from, to: area.to };
-  } else {
-    newFilters.area = { from: fromArea, to: toArea };
-  }
-
-  newFilters.type = selectedHousingItem;
-  newFilters.deliveryStatus = deliveryState;
-  newFilters.completion = completionPercent;
-  newFilters.paymentPlan = paymentPlan;
-
-  dispatch(fetchProperties(newFilters));
-};
+  const getInstallmentMonths = (plan: string | null) => {
+    switch (plan) {
+      case 'دفعة واحدة': return 0;
+      case 'تقسيط 3 أشهر': return 3;
+      case 'تقسيط 6 أشهر': return 6;
+      case 'تقسيط 12 شهر': return 12;
+      default: return 0;
+    }
+  };
 
 
   // const handleFilterPress = (
   //   type: 'للبيع' | 'للايجار' | null,
   //   bedrooms: string | null = null,
   //   bathrooms: string | null = null,
-  //   price?: { from: number; to: number }
+  //   price?: { from: number; to: number },
+  //   area?: { from: number; to: number },
+  //   deliveryMonth?: number | null,
+  //   deliveryYear?: number | null
   // ) => {
   //   const newFilters: Record<string, any> = { ...filters };
 
   //   if (type) newFilters.transactionType = type;
   //   if (bedrooms) newFilters.bedrooms = bedrooms;
-  //   if (bathrooms) newFilters.bathroom = bathrooms; // أضفنا الحمامات
+  //   if (bathrooms) newFilters.bathroom = bathrooms;
 
-  //   if (price) {
-  //     newFilters.price = { from: price.from, to: price.to };
-  //   } else {
-  //     newFilters.price = { from: fromPrice, to: toPrice };
-  //   }
+  //   // السعر
+  //   newFilters.price = price
+  //     ? { from: price.from, to: price.to }
+  //     : { from: fromPrice, to: toPrice };
 
-  //   newFilters.area = { from: fromArea, to: toArea };
+  //   // المساحة
+  //   newFilters.area = area
+  //     ? { from: area.from, to: area.to }
+  //     : { from: fromArea, to: toArea };
+
   //   newFilters.type = selectedHousingItem;
   //   newFilters.deliveryStatus = deliveryState;
   //   newFilters.completion = completionPercent;
   //   newFilters.paymentPlan = paymentPlan;
 
+  //   // تاريخ التسليم
+  //   if (deliveryMonth && deliveryYear) {
+  //     newFilters.deliveryMonth = deliveryMonth;
+  //     newFilters.deliveryYear = deliveryYear;
+  //   }
+
   //   dispatch(fetchProperties(newFilters));
   // };
+
+  // دالة الفلترة
+
+  const handleFilterPress = (
+  type: 'للبيع' | 'للايجار' | null,
+  bedrooms: string | null = null,
+  bathrooms: string | null = null,
+  price?: { from: number; to: number },
+  area?: { from: number; to: number },
+  deliveryMonth?: number | null,
+  deliveryYear?: number | null,
+  plan?: string | null,
+  country?: string,
+  city?: string,
+  district?: string
+) => {
+  const newFilters: Record<string, any> = { ...filters };
+
+  // نوع المعاملة
+  if (type) newFilters.transactionType = type;
+
+  // غرف النوم والحمامات
+  if (bedrooms) newFilters.bedrooms = bedrooms;
+  if (bathrooms) newFilters.bathroom = bathrooms;
+
+  // السعر
+  newFilters.price = price
+    ? { from: price.from, to: price.to }
+    : { from: fromPrice, to: toPrice };
+
+  // المساحة
+  newFilters.area = area
+    ? { from: area.from, to: area.to }
+    : { from: fromArea, to: toArea };
+
+  // نوع السكن/التجاري
+  if (selectedHousingItem) newFilters.type = selectedHousingItem;
+
+  // حالة التسليم
+  if (deliveryState) newFilters.deliveryStatus = deliveryState;
+
+  // نسبة الإنجاز
+  if (completionPercent) newFilters.completion = completionPercent;
+
+  // خطة السداد
+  const installment = getInstallmentMonths(plan ?? paymentPlan);
+  if (installment > 0) newFilters.installmentMonths = installment;
+
+  // تاريخ التسليم
+  if (deliveryMonth && deliveryYear) {
+    newFilters.deliveryMonth = deliveryMonth;
+    newFilters.deliveryYear = deliveryYear;
+  }
+
+  // الدولة والمدينة والحي
+  if (country && country.trim() !== '') newFilters.country = country.trim();
+  if (city && city.trim() !== '') newFilters.city = city.trim();
+  if (district && district.trim() !== '') newFilters.district = district.trim();
+
+  // إرسال الفلاتر للـ Redux
+  dispatch(fetchProperties(newFilters));
+};
+
 
   return (
     <View style={{ justifyContent: 'flex-start', backgroundColor: backgroundColor }}>
@@ -212,9 +262,21 @@ const handleFilterPress = (
         contentContainerStyle={{ paddingHorizontal: 16, alignItems: 'flex-start' }}
       >
         {/* أيقونات الفلاتر */}
-        <TagBox isSelected={selectedFilters.includes('فلتر')} onPress={() => toggleFilter('فلتر')}>
+        <TagBox isSelected={selectedFilters.includes('فلتر')} onPress={() => {
+          // إعادة ضبط الحالات المحلية
+          setSelectedFilters([]);
+          setSingleSelectWord(null);
+          setSaleType(null);
+
+          // استدعاء دالة خارجية إذا موجودة
+          onClearFilters?.();
+
+          // تمرير فلاتر فارغة للـ Redux
+          dispatch(fetchProperties({}));
+        }}
+        >
           {/* <MaterialCommunityIcons name="table-filter" size={18} color="#333" /> */}
-          <Ionicons name="filter-outline" size={24} color="#333" />
+          <Ionicons name="list-outline" size={24} color="#444" />
         </TagBox>
 
         {/* فلتر sale */}
@@ -229,15 +291,17 @@ const handleFilterPress = (
         </TagBox>
 
         {/* الكلمات الثلاث */}
-        <MultiWordTagBox
+        {/* <MultiWordTagBox
           words={["الجميع", "جاهز", "قيد الإنشاء"]}
           selectedWord={singleSelectWord}
           onWordPress={(word) => toggleFilter(word)}
-        />
+        /> */}
 
         {/* باقي الفلاتر */}
         {[
           { label: "سكني", icon: <Ionicons name="home-outline" size={16} color="#444" /> },
+          { label: "المكان", icon: <Ionicons name="location-outline" size={16} color="#444" /> }, // هنا أضفنا المكان
+
           { label: "غرف النوم", icon: <Ionicons name="bed-outline" size={16} color="#444" /> },
           { label: "السعر", icon: <Ionicons name="pricetag-outline" size={16} color="#444" /> },
           { label: "الحمامات", icon: <Ionicons name="water-outline" size={16} color="#444" /> },
@@ -245,8 +309,6 @@ const handleFilterPress = (
 
           { label: "التسليم", icon: <Ionicons name="timer-outline" size={16} color="#444" /> },
           { label: "خطة السداد", icon: <Ionicons name="cash-outline" size={16} color="#444" /> },
-          { label: "اكتمال", icon: <Ionicons name="checkmark-done-outline" size={16} color="#444" /> },
-          { label: "الجميع", icon: <Ionicons name="list-outline" size={16} color="#444" /> },
 
         ].map((item, index) => {
           const isSingleSelect = ["جاهز", "قيد الإنشاء", "الجميع"].includes(item.label!);
@@ -346,6 +408,34 @@ const handleFilterPress = (
 
               </View>
             )}
+            {currentBottomSheet === 'المكان' && (
+              <LocationFilter
+                onFilterPress={(city, district) => {
+                  // حفظ القيم أو تمريرها للفلترة
+                  setSelectedCity(city);
+                  setSelectedDistrict(district);
+
+                  // تمرير الفلتر الرئيسي لو عندك دالة handleFilterPress
+                  handleFilterPress(
+                    null,  // type
+                    null,  // bedrooms
+                    null,  // bathrooms
+                    undefined, // price
+                    undefined, // area
+                    undefined, // deliveryMonth
+                    undefined, // deliveryYear
+                    undefined, // plan
+                    selectedCountry, // country
+                    city,           // city
+                    district        // district
+                  );
+                  // إغلاق الـ BottomSheet بعد الاختيار
+                  bottomSheetRef.current?.close();
+                  setCurrentBottomSheet(null);
+                }}
+              />
+            )}
+
             {currentBottomSheet === 'سكني' && (
               <View>
                 {/* زرين سكني / تجاري */}
@@ -489,12 +579,12 @@ const handleFilterPress = (
 
                   <MultiSlider
                     values={[fromPrice, toPrice]}
-                    min={0}
-                    max={10000}
-                    step={100}
+                    min={0}             // الحد الأدنى
+                    max={100_000_000}   // الحد الأعلى (100 مليون)
+                    step={100_000}      // خطوة كل 100 ألف جنيه، ممكن تغيرها حسب رغبتك
                     allowOverlap={false}
                     snapped
-                    sliderLength={300} // أو اضبط حسب العرض المطلوب
+                    sliderLength={300} // اضبط حسب العرض المطلوب
                     onValuesChange={(values) => {
                       setFromPrice(values[0]);
                       setToPrice(values[1]);
@@ -503,6 +593,7 @@ const handleFilterPress = (
                     unselectedStyle={{ backgroundColor: '#ccc' }}
                     markerStyle={{ backgroundColor: '#4CAF50' }}
                   />
+
                 </View>
 
                 {/* أزرار إعادة الضبط وتطبيق */}
@@ -539,31 +630,6 @@ const handleFilterPress = (
                   <Text style={{ fontSize: 16, fontWeight: '700', marginLeft: 8 }}>تاريخ التسليم</Text>
                 </View>
 
-                {/* اختيار الحالة */}
-                <View style={{ flexDirection: 'row', marginBottom: 16 }}>
-                  {['الجميع', 'جاهز', 'قيد الإعداد'].map((state) => (
-                    <Pressable
-                      key={state}
-                      onPress={() => {
-                        if (["الجميع", "جاهز", "قيد الإعداد"].includes(state)) {
-                          setDeliveryState(state as "الجميع" | "جاهز" | "قيد الإعداد");
-                        }
-                      }}
-                      style={{
-                        paddingVertical: 8,
-                        paddingHorizontal: 14,
-                        borderRadius: 20,
-                        marginRight: 8,
-                        backgroundColor: deliveryState === state ? '#d4f5d4' : '#f5f5f5',
-                        borderWidth: deliveryState === state ? 2 : 0,
-                        borderColor: deliveryState === state ? '#4CAF50' : 'transparent',
-                      }}
-                    >
-                      <Text>{state}</Text>
-                    </Pressable>
-                  ))}
-
-                </View>
 
                 {/* اختيار التاريخ */}
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
@@ -579,13 +645,40 @@ const handleFilterPress = (
                   {/* زر إعادة الضبط */}
                   <Pressable
                     onPress={() => {
-                      setSelectedDate(null);
-                      setDeliveryState('الجميع');
+                      let deliveryMonth = null;
+                      let deliveryYear = null;
+
+                      if (selectedDate) {
+                        deliveryMonth = selectedDate.getMonth() + 1;
+                        deliveryYear = selectedDate.getFullYear();
+                      }
+
+                      const filterLabel = selectedDate
+                        ? `${deliveryMonth} / ${deliveryYear}${deliveryState !== 'الجميع' ? ` - ${deliveryState}` : ''}`
+                        : deliveryState !== 'الجميع'
+                          ? deliveryState
+                          : '';
+
+                      onFilterPress?.(filterLabel);
+
+                      handleFilterPress(
+                        saleType,
+                        selectedRoom,
+                        selectedBath,
+                        undefined,
+                        undefined,
+                        deliveryMonth,
+                        deliveryYear
+                      );
+
+                      bottomSheetRef.current?.close();
+                      setCurrentBottomSheet(null);
                     }}
-                    style={[styles.actionButton, { backgroundColor: '#ccc', marginLeft: 10, paddingHorizontal: 12 }]}
+                    style={[styles.actionButton, { backgroundColor: '#4CAF50', marginTop: 20 }]}
                   >
-                    <Text style={{ fontWeight: '700' }}>إعادة الضبط</Text>
+                    <Text style={{ color: '#fff', fontWeight: '700', textAlign: 'center' }}>تطبيق</Text>
                   </Pressable>
+
                 </View>
 
                 {/* DateTimePicker */}
@@ -685,17 +778,17 @@ const handleFilterPress = (
                   </Pressable>
 
                   <Pressable
-                   onPress={() => {
-    handleFilterPress(
-      saleType,
-      selectedRoom,
-      selectedBath,
-      { from: fromPrice, to: toPrice }, // السعر لو مستخدم
-      { from: fromArea, to: toArea }    // ← أضفنا هنا المساحة
-    );
-    bottomSheetRef.current?.close();
-    setCurrentBottomSheet(null);
-  }}
+                    onPress={() => {
+                      handleFilterPress(
+                        saleType,
+                        selectedRoom,
+                        selectedBath,
+                        { from: fromPrice, to: toPrice }, // السعر لو مستخدم
+                        { from: fromArea, to: toArea }    // ← أضفنا هنا المساحة
+                      );
+                      bottomSheetRef.current?.close();
+                      setCurrentBottomSheet(null);
+                    }}
                     style={[styles.actionButton]}
                   >
                     <Text style={{ color: 'green', fontWeight: '700' }}>تطبيق</Text>
@@ -743,7 +836,7 @@ const handleFilterPress = (
 
                   <Pressable
                     onPress={() => {
-                      onFilterPress?.(paymentPlan);
+                      handleFilterPress(null, null, null, undefined, undefined, undefined, undefined, paymentPlan);
                       bottomSheetRef.current?.close();
                       setCurrentBottomSheet(null);
                     }}
@@ -755,66 +848,7 @@ const handleFilterPress = (
               </View>
             )}
 
-            {currentBottomSheet === 'اكتمال' && (
-              <View style={{ padding: 16 }}>
-                {/* أيقونة ونص */}
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                  <Ionicons name="pie-chart-outline" size={24} color="#444" />
-                  <Text style={{ fontSize: 16, fontWeight: '700', marginLeft: 8 }}>نسبة الاكتمال</Text>
-                </View>
 
-                {/* مستطيل لإظهار القيمة */}
-                <View style={{ marginBottom: 16, alignItems: 'center' }}>
-                  <Text style={{ fontSize: 18, fontWeight: '700' }}>{completionPercent}%</Text>
-                </View>
-
-                {/* Slider للنسبة */}
-                <MultiSlider
-                  values={[completionPercent]}
-                  min={0}
-                  max={100}
-                  step={1}
-                  onValuesChange={(values) => setCompletionPercent(values[0])}
-                  sliderLength={300}
-                  selectedStyle={{ backgroundColor: '#4CAF50' }}
-                  unselectedStyle={{ backgroundColor: '#ccc' }}
-                  markerStyle={{ backgroundColor: '#4CAF50' }}
-                />
-
-                {/* أزرار إعادة الضبط وتطبيق */}
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
-                  <Pressable
-                    onPress={() => setCompletionPercent(0)}
-                    style={[styles.actionButton,]}
-                  >
-                    <Text style={{ fontWeight: '700' }}>إعادة الضبط</Text>
-                  </Pressable>
-
-                  <Pressable
-                    onPress={() => {
-                      onFilterPress?.(`${completionPercent}%`);
-                      bottomSheetRef.current?.close();
-                      setCurrentBottomSheet(null);
-                    }}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      paddingHorizontal: 20,
-                      borderRadius: 12,
-                    }}
-                  >
-                    {/* أيقونة داخل الزرار */}
-                    <Ionicons name="checkmark-circle-outline" size={20} color="green" style={{ marginRight: 8 }} />
-
-                    {/* النص */}
-                    <Text style={{ color: 'green', fontWeight: '700', fontSize: 16 }}>تطبيق</Text>
-                  </Pressable>
-
-                </View>
-              </View>
-            )}
-            {/* محتوى البيع/الإيجار أو محتوى الفلتر */}
             {currentBottomSheet === 'للبيع' && (
               <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
                 <Pressable
