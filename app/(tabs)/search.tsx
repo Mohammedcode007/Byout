@@ -188,6 +188,7 @@ useEffect(() => {
                     area: property.area ?? 0,
                     price: property.price ?? 0,
                     id: property._id,
+                    phone:property.phone,
                     deliveryDate: property.deliveryDate ?? new Date().toISOString(),
                     advancePayment: property.advancePayment ?? 0,
                     contact: {

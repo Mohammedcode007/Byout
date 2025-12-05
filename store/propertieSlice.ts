@@ -9,6 +9,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 // ===== Types =====
 export type PropertyData = {
+  phone: string | undefined;
   _id?: string;
   title: string;
   description?: string;
