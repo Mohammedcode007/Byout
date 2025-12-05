@@ -46,8 +46,10 @@ export default function ContactButtons({
 
       <Pressable
         style={[styles.contactTag, { backgroundColor: contactBackground }]}
-        onPress={onPressCall}
-      >
+  onPress={() => {
+    console.log('تم الضغط على الزر!');
+    onPressCall && onPressCall(); // ← استدعاء الدالة إذا كانت موجودة
+ }}      >
         <Ionicons name="call-outline" size={16} color={subTextColor} />
         <Text style={[styles.contactText, { color: subTextColor }]}>اتصال</Text>
       </Pressable>

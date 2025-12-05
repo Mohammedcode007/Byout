@@ -4,6 +4,7 @@ import MoreItem from '@/components/MoreItem';
 import { useAppDispatch, useAppSelector } from '@/hooks/useAuth';
 import i18n, { loadLocale, setLocale } from '@/i18n';
 import { logout } from '@/store/authSlice';
+import { clearFavoritesState } from '@/store/favoritesSlice';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as Updates from 'expo-updates';
@@ -19,10 +20,11 @@ export default function MoreScreen() {
   const dispatch = useAppDispatch();
   const { isLoggedIn } = useAppSelector(state => state.auth);
   const { user, token, loading } = useAppSelector((state) => state.auth);
-const colorScheme = useColorScheme(); // 'light' أو 'dark'
+  const colorScheme = useColorScheme(); // 'light' أو 'dark'
   const isDark = colorScheme === 'dark';
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const [selectedLang, setSelectedLang] = useState<'en' | 'ar'>(i18n.locale.startsWith('ar') ? 'ar' : 'en');
+
 
   useEffect(() => {
     const init = async () => {
@@ -65,10 +67,12 @@ const colorScheme = useColorScheme(); // 'light' أو 'dark'
 
   const handleLogout = () => {
     dispatch(logout());
+      dispatch(clearFavoritesState());
+
   };
 
   return (
-  <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? '#121212' : '#fff' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? '#121212' : '#fff' }}>
       <Animated.ScrollView
         style={{ flex: 1, backgroundColor: isDark ? '#121212' : '#fff', paddingTop: 20 }}
         onScroll={Animated.event(
@@ -107,19 +111,19 @@ const colorScheme = useColorScheme(); // 'light' أو 'dark'
         <View style={{ marginBottom: 100 }}>
           <ActivityCard onPress={() => console.log('Activity card pressed!')} />
           <Text style={[styles.header, { color: isDark ? '#fff' : '#222' }]}>{i18n.t('discover_more')}</Text>
-          <MoreItem icon="person-circle-outline" title={i18n.t('profile')} onPress={() => {}} iconOpacity={0.4} />
+          <MoreItem icon="person-circle-outline" title={i18n.t('profile')} onPress={() => { }} iconOpacity={0.4} />
           <MoreItem
             icon="settings-outline"
             title={i18n.t('settings')}
             iconOpacity={0.4}
             onPress={() => router.push("/updateUser")}
           />
-          <MoreItem icon="notifications-outline" title={i18n.t('notifications')} onPress={() => {}} iconOpacity={0.4} />
+          <MoreItem icon="notifications-outline" title={i18n.t('notifications')} onPress={() => { }} iconOpacity={0.4} />
           <MoreItem icon="language-outline" title={i18n.t('language')} onPress={() => setLanguageModalVisible(true)} iconOpacity={0.4} />
-          <MoreItem icon="newspaper-outline" title={i18n.t('blog')} onPress={() => {}} iconOpacity={0.4} />
-          <MoreItem icon="call-outline" title={i18n.t('contact')} onPress={() => {}} iconOpacity={0.4} />
-          <MoreItem icon="information-circle-outline" title={i18n.t('about')} onPress={() => {}} iconOpacity={0.4} />
-          <MoreItem icon="shield-checkmark-outline" title={i18n.t('privacy')} onPress={() => {}} iconOpacity={0.4} />
+          <MoreItem icon="newspaper-outline" title={i18n.t('blog')} onPress={() => { }} iconOpacity={0.4} />
+          <MoreItem icon="call-outline" title={i18n.t('contact')} onPress={() => { }} iconOpacity={0.4} />
+          <MoreItem icon="information-circle-outline" title={i18n.t('about')} onPress={() => { }} iconOpacity={0.4} />
+          <MoreItem icon="shield-checkmark-outline" title={i18n.t('privacy')} onPress={() => { }} iconOpacity={0.4} />
           <MoreItem icon="log-out-outline" title={i18n.t('log_out')} onPress={handleLogout} iconOpacity={0.4} />
         </View>
 
@@ -167,7 +171,7 @@ const styles = StyleSheet.create({
   langButtonSelected: { backgroundColor: '#4A90E2' },
   langTextSelected: { color: '#fff', fontWeight: '600' },
   closeButton: { marginTop: 20, paddingVertical: 12, paddingHorizontal: 40, borderRadius: 20, borderWidth: 1, borderColor: '#4A90E2', backgroundColor: '#fff' },
-  loggedInContainer: { borderColor:'grey',borderWidth:0.5,flexDirection: 'row', alignItems: 'center', marginTop: -20, justifyContent: 'center', backgroundColor: '#fff', paddingLeft: 20, paddingRight: 20, borderRadius: 25 },
+  loggedInContainer: { borderColor: 'grey', borderWidth: 0.5, flexDirection: 'row', alignItems: 'center', marginTop: -20, justifyContent: 'center', backgroundColor: '#fff', paddingLeft: 20, paddingRight: 20, borderRadius: 25 },
   welcomeText: { fontSize: 16, fontWeight: '600', marginRight: 10, color: '#222' },
   logoutButton: { padding: 4, borderRadius: 8, backgroundColor: '#f5f5f5' },
 

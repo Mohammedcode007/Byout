@@ -1,93 +1,37 @@
-// import { MaterialIcons } from '@expo/vector-icons'; // أيقونة البحث
+
+// import PropertyCard from '@/components/PropertyCard';
+// import { useAppSelector } from '@/hooks/useAuth';
+// import { selectFavorites } from '@/store/favoritesSlice';
+// import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 // import { Image } from 'expo-image';
+// import { useRouter } from 'expo-router';
 // import { useState } from 'react';
-// import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+// import { NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+// import { SafeAreaView } from 'react-native-safe-area-context';
 
 // export default function HomeScreen() {
 //   const [selectedMain, setSelectedMain] = useState<'aqarat' | 'projects'>('projects');
 //   const [selectedOption, setSelectedOption] = useState<'sale' | 'rent' | null>("sale");
+//   const [showMiniHeader, setShowMiniHeader] = useState(false);
+//   const router = useRouter();
 
+//   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+//     const offsetY = event.nativeEvent.contentOffset.y;
+//     if (offsetY > 200) { // لو تجاوز التمرير 200، أظهر الـHeader الجديد
+//       setShowMiniHeader(true);
+//     } else {
+//       setShowMiniHeader(false);
+//     }
+//   };
+//   const favorites = useAppSelector(selectFavorites);
+//   const firstFavorite = favorites[0]; // أول عنصر في المفضلة
 //   return (
-//     <ScrollView style={{ flex: 1 }}>
+//     <View style={{ flex: 1,backgroundColor:'#fff' }}>
 
-//       {/* الهيدر */}
-//       <Image
-//         source={{
-//           uri: 'https://i.pinimg.com/1200x/db/62/41/db62413910729e4e33d15d30e57a112a.jpg',
-//         }}
-//         style={styles.headerImage}
-//       />
-
-//       {/* الكارد الرئيسي */}
-//       <View style={styles.floatingCard}>
-//         <View style={styles.buttonRow}>
-//           <Pressable
-//             onPress={() => setSelectedMain('aqarat')}
-//             style={[
-//               styles.mainButton,
-//               selectedMain === 'aqarat' && styles.activeBtnGreen,
-//             ]}
-//           >
-//             <Text style={[styles.btnText, selectedMain === 'aqarat' && { color: '#fff' }]}>
-//               عقارات
-//             </Text>
-//           </Pressable>
-
-//           <Pressable
-//             onPress={() => setSelectedMain('projects')}
-//             style={[
-//               styles.mainButton,
-//               selectedMain === 'projects' && styles.activeBtnGreen,
-//             ]}
-//           >
-//             <Text style={[styles.btnText, selectedMain === 'projects' && { color: '#fff' }]}>
-//               مشاريع جديدة
-//             </Text>
-//           </Pressable>
-//         </View>
-//       </View>
-
-//       {/* كارد الخيارات */}
-//       {selectedMain === 'aqarat' && (
-//         <View style={styles.optionsCard}>
-//           <View style={styles.buttonRow}>
-//          <Pressable
-//               onPress={() => setSelectedOption('sale')}
-//               style={[
-//                 styles.subButton,
-//                 selectedOption === 'sale' ? styles.subButtonActive : styles.subButtonInactive,
-//               ]}
-//             >
-//               <Text style={[
-//                 styles.btnText,
-//                 selectedOption === 'sale' ? styles.subBtnTextActive : styles.subBtnTextInactive
-//               ]}>
-//                 للبيع
-//               </Text>
-//             </Pressable>
-
-//             <Pressable
-//               onPress={() => setSelectedOption('rent')}
-//               style={[
-//                 styles.subButton,
-//                 selectedOption === 'rent' ? styles.subButtonActive : styles.subButtonInactive,
-//               ]}
-//             >
-//               <Text style={[
-//                 styles.btnText,
-//                 selectedOption === 'rent' ? styles.subBtnTextActive : styles.subBtnTextInactive
-//               ]}>
-//                 للإيجار
-//               </Text>
-//             </Pressable>
-//           </View>
-//           {selectedMain === 'aqarat' && (
-//               <View style={styles.divider} />
-//           )}
-            
-
-
-//             <View style={styles.searchContainer}>
+//       {/* Header صغير يظهر عند التمرير */}
+//       {showMiniHeader && (
+//         <SafeAreaView style={styles.miniHeader}>
+//           <View style={styles.searchContainer}>
 //             <MaterialIcons name="search" size={20} color="#2e7d32" style={{ marginRight: 8 }} />
 //             <TextInput
 //               placeholder="بحث..."
@@ -95,20 +39,159 @@
 //               placeholderTextColor="#2e7d32"
 //             />
 //           </View>
-//         </View>
+//         </SafeAreaView >
 //       )}
 
-//       {selectedMain === 'projects' && (
-//         <View style={styles.optionsCard}>
-//           <TextInput
-//             placeholder="بحث..."
-//             style={styles.searchInput}
-//             placeholderTextColor="#666"
-//           />
-//         </View>
-//       )}
+//       <ScrollView style={{ flex: 1 }} onScroll={handleScroll} scrollEventThrottle={16}>
+//         {/* الهيدر الكبير */}
+//         <Image
+//           source={{
+//             uri: 'https://i.pinimg.com/1200x/db/62/41/db62413910729e4e33d15d30e57a112a.jpg',
+//           }}
+//           style={styles.headerImage}
+//         />
 
-//     </ScrollView>
+//         {/* الكارد الرئيسي */}
+//         {!showMiniHeader && (
+//           <View style={styles.floatingCard}>
+//             <View style={styles.buttonRow}>
+//               <Pressable
+//                 onPress={() => setSelectedMain('aqarat')}
+//                 style={[
+//                   styles.mainButton,
+//                   selectedMain === 'aqarat' && styles.activeBtnGreen,
+//                 ]}
+//               >
+//                 <Text style={[styles.btnText, selectedMain === 'aqarat' && { color: '#fff' }]}>
+//                   عقارات
+//                 </Text>
+//               </Pressable>
+
+//               <Pressable
+//                 onPress={() => setSelectedMain('projects')}
+//                 style={[
+//                   styles.mainButton,
+//                   selectedMain === 'projects' && styles.activeBtnGreen,
+//                 ]}
+//               >
+//                 <Text style={[styles.btnText, selectedMain === 'projects' && { color: '#fff' }]}>
+//                   مشاريع جديدة
+//                 </Text>
+//               </Pressable>
+//             </View>
+//           </View>
+//         )}
+
+//         {/* كارد الخيارات */}
+//         {!showMiniHeader && selectedMain === 'aqarat' && (
+//           <View style={styles.optionsCard}>
+//             <View style={styles.buttonRow}>
+//               <Pressable
+//                 onPress={() => setSelectedOption('sale')}
+//                 style={[
+//                   styles.subButton,
+//                   selectedOption === 'sale' ? styles.subButtonActive : styles.subButtonInactive,
+//                 ]}
+//               >
+//                 <Text style={[
+//                   styles.btnText,
+//                   selectedOption === 'sale' ? styles.subBtnTextActive : styles.subBtnTextInactive
+//                 ]}>
+//                   للبيع
+//                 </Text>
+//               </Pressable>
+
+//               <Pressable
+//                 onPress={() => setSelectedOption('rent')}
+//                 style={[
+//                   styles.subButton,
+//                   selectedOption === 'rent' ? styles.subButtonActive : styles.subButtonInactive,
+//                 ]}
+//               >
+//                 <Text style={[
+//                   styles.btnText,
+//                   selectedOption === 'rent' ? styles.subBtnTextActive : styles.subBtnTextInactive
+//                 ]}>
+//                   للإيجار
+//                 </Text>
+//               </Pressable>
+//             </View>
+//             <View style={styles.divider} />
+
+//             <View style={styles.searchContainer}>
+//               <MaterialIcons name="search" size={20} color="#2e7d32" style={{ marginRight: 8 }} />
+//               <TextInput
+//                 placeholder="بحث..."
+//                 style={styles.searchInputWithIcon}
+//                 placeholderTextColor="#2e7d32"
+//               />
+//             </View>
+//           </View>
+//         )}
+
+//         {!showMiniHeader && selectedMain === 'projects' && (
+//           <View style={styles.optionsCard}>
+//             <TextInput
+//               placeholder="بحث..."
+//               style={styles.searchInput}
+//               placeholderTextColor="#666"
+//             />
+//           </View>
+//         )}
+
+//         {/* مساحة افتراضية للتمرير */}
+//         <View style={{ height: 20 }} />
+//         {/* عرض أول عنصر من المفضلة وزر التوجه إلى صفحة المحفوظات */}
+//         {firstFavorite && (
+//           <View style={{ padding: 16,marginBottom: 80 }}>
+//             {/* <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>
+//               أول عنصر من المفضلة
+//             </Text> */}
+
+//             <View key={firstFavorite._id} style={{ marginBottom: 20 }}>
+//               <PropertyCard
+//                 item={{
+//                   ...firstFavorite,
+//                   images: firstFavorite.images?.[0]
+//                     ? firstFavorite.images[0].includes(',')
+//                       ? firstFavorite.images[0].split(',').map((img: string) => img.trim())
+//                       : firstFavorite.images
+//                     : [],
+//                   bedrooms: firstFavorite.bedrooms ?? 0,
+//                   bathrooms: firstFavorite.bathrooms ?? 0,
+//                   area: firstFavorite.area ?? 0,
+//                   price: firstFavorite.price ?? 0,
+//                   id: firstFavorite._id,
+//                   deliveryDate: firstFavorite.deliveryDate ?? new Date().toISOString(),
+//                   advancePayment: firstFavorite.advancePayment ?? 0,
+//                   contact: {
+//                     phone: firstFavorite.contact?.phone ?? 'غير متوفر',
+//                     email: firstFavorite.contact?.email ?? 'غير متوفر',
+//                   },
+//                 }}
+//                 onPress={() => router.push(`/property/${firstFavorite._id}`)}
+//               />
+//             </View>
+
+//             <Pressable
+//               style={{
+//                 flexDirection: 'row',
+//                 alignItems: 'center',
+//                 justifyContent: 'center',
+//                 paddingVertical: 10,
+//                 backgroundColor: '#2e7d32',
+//                 borderRadius: 8,
+//               }}
+//               onPress={() => router.push('/save')}
+//             >
+//               <Ionicons name="heart" size={20} color="#fff" style={{ marginRight: 6 }} />
+//               <Text style={{ color: '#fff', fontWeight: 'bold' }}>عرض المحفوظات</Text>
+//             </Pressable>
+//           </View>
+//         )}
+
+//       </ScrollView>
+//     </View>
 //   );
 // }
 
@@ -118,11 +201,10 @@
 //     width: '100%',
 //     resizeMode: 'cover',
 //   },
-
 //   floatingCard: {
 //     backgroundColor: 'white',
 //     padding: 10,
-//     borderRadius: 16,
+//     borderRadius: 20,
 //     marginTop: -120,
 //     marginHorizontal: 10,
 //     shadowColor: '#000',
@@ -130,7 +212,6 @@
 //     shadowRadius: 10,
 //     elevation: 6,
 //   },
-
 //   optionsCard: {
 //     backgroundColor: 'white',
 //     padding: 16,
@@ -142,11 +223,17 @@
 //     shadowRadius: 8,
 //     elevation: 4,
 //   },
-
 //   buttonRow: {
 //     flexDirection: 'row',
 //     justifyContent: 'space-between',
 //     gap: 2,
+//   },
+//   searchInput: {
+//     backgroundColor: '#fff',
+//     paddingVertical: 12,
+//     paddingHorizontal: 12,
+//     borderRadius: 10,
+//     fontSize: 16,
 //   },
 
 //   mainButton: {
@@ -155,79 +242,82 @@
 //     borderRadius: 20,
 //     alignItems: 'center',
 //   },
-
 //   activeBtnGreen: {
-//     backgroundColor: '#4bc04dff', // أخضر داكن
+//     backgroundColor: '#4bc04dff',
 //   },
-
 //   subButton: {
 //     flex: 1,
-//     backgroundColor: '#c8e6c9', // أخضر فاتح
+//     backgroundColor: '#c8e6c9',
 //     paddingVertical: 5,
 //     borderRadius: 8,
 //     alignItems: 'center',
 //   },
-
 //   btnText: {
-//     color: '#000', // اللون الافتراضي
+//     color: '#000',
 //     fontSize: 14,
 //     fontWeight: '400',
 //   },
-
-//   searchInput: {
-//     backgroundColor: '#fff',
-//     paddingVertical: 12,
-//     paddingHorizontal: 12,
-//     borderRadius: 10,
-//     fontSize: 16,
-//   },
-//     subButtonActive: {
+//   subButtonActive: {
 //     backgroundColor: '#cfefd0ff',
 //   },
-
-//  subButtonInactive: {
-//   backgroundColor: '#fff',
-//   borderColor: '#ccc', // رمادي فاتح
-//   borderWidth: 0.5,
-//   borderRadius: 8,      // نصف قطر الزوايا
-//   alignItems: 'center',
-// },
-
-//    subBtnTextActive: {
+//   subButtonInactive: {
+//     backgroundColor: '#fff',
+//     borderColor: '#ccc',
+//     borderWidth: 0.5,
+//     borderRadius: 8,
+//     alignItems: 'center',
+//   },
+//   subBtnTextActive: {
 //     color: '#2e7d32',
 //     fontWeight: '400',
 //   },
-
 //   subBtnTextInactive: {
 //     color: 'black',
 //     fontWeight: '400',
 //   },
 //   divider: {
-//   height: 1,
-//   backgroundColor: '#ccc',
-//   marginVertical: 12, // مسافة بين الزرين والخط، والخط والبحث
-//   borderRadius: 0.5,
-// },
-
-//     searchContainer: {
+//     height: 1,
+//     backgroundColor: '#ccc',
+//     marginVertical: 12,
+//     borderRadius: 0.5,
+//   },
+//   searchContainer: {
 //     flexDirection: 'row',
 //     alignItems: 'center',
 //     marginTop: 12,
 //     backgroundColor: '#fff',
 //     paddingHorizontal: 12,
 //     borderRadius: 10,
-  
 //   },
-
 //   searchInputWithIcon: {
 //     flex: 1,
 //     height: 40,
 //     fontSize: 16,
 //   },
+//   miniHeader: {
+//     position: 'absolute',
+//     top: 0,
+//     left: 0,
+//     right: 0,
+//     height: '15%',
+//     backgroundColor: '#dff4e3ff',
+//     padding: 10,
+//     zIndex: 10,
+//     shadowColor: '#000',
+//     shadowOpacity: 0.1,
+//     shadowRadius: 4,
+//     elevation: 5,
+//   },
+
 // });
 
-import { MaterialIcons } from '@expo/vector-icons';
+
+import PropertyCard from '@/components/PropertyCard';
+import { useAppSelector } from '@/hooks/useAuth';
+import { selectFavorites } from '@/store/favoritesSlice';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -236,6 +326,7 @@ export default function HomeScreen() {
   const [selectedMain, setSelectedMain] = useState<'aqarat' | 'projects'>('projects');
   const [selectedOption, setSelectedOption] = useState<'sale' | 'rent' | null>("sale");
   const [showMiniHeader, setShowMiniHeader] = useState(false);
+  const router = useRouter();
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetY = event.nativeEvent.contentOffset.y;
@@ -245,13 +336,14 @@ export default function HomeScreen() {
       setShowMiniHeader(false);
     }
   };
-
+  const favorites = useAppSelector(selectFavorites);
+  const firstFavorite = favorites[0]; // أول عنصر في المفضلة
   return (
-    <View style={{ flex: 1 }}>
-      
+    <View style={{ flex: 1,backgroundColor:'#fff' }}>
+
       {/* Header صغير يظهر عند التمرير */}
       {showMiniHeader && (
-        <SafeAreaView  style={styles.miniHeader}>
+        <SafeAreaView style={styles.miniHeader}>
           <View style={styles.searchContainer}>
             <MaterialIcons name="search" size={20} color="#2e7d32" style={{ marginRight: 8 }} />
             <TextInput
@@ -263,106 +355,135 @@ export default function HomeScreen() {
         </SafeAreaView >
       )}
 
-      <ScrollView style={{ flex: 1 }} onScroll={handleScroll} scrollEventThrottle={16}>
-        {/* الهيدر الكبير */}
-        <Image
-          source={{
-            uri: 'https://i.pinimg.com/1200x/db/62/41/db62413910729e4e33d15d30e57a112a.jpg',
-          }}
-          style={styles.headerImage}
+     <ScrollView style={{ flex: 1 }} onScroll={handleScroll} scrollEventThrottle={16}>
+  {/* الهيدر الكبير */}
+  <Image
+    source={{
+      uri: 'https://i.pinimg.com/1200x/db/62/41/db62413910729e4e33d15d30e57a112a.jpg',
+    }}
+    style={styles.headerImage}
+  />
+
+  {/* الكارد الرئيسي */}
+  {!showMiniHeader && (
+    <View style={styles.floatingCard}>
+      <View style={styles.buttonRow}>
+        <Pressable
+          onPress={() => setSelectedMain('aqarat')}
+          style={[styles.mainButton, selectedMain === 'aqarat' && styles.activeBtnGreen]}
+        >
+          <Text style={[styles.btnText, selectedMain === 'aqarat' && { color: '#fff' }]}>
+            عقارات
+          </Text>
+        </Pressable>
+
+        <Pressable
+          onPress={() => setSelectedMain('projects')}
+          style={[styles.mainButton, selectedMain === 'projects' && styles.activeBtnGreen]}
+        >
+          <Text style={[styles.btnText, selectedMain === 'projects' && { color: '#fff' }]}>
+            مشاريع جديدة
+          </Text>
+        </Pressable>
+      </View>
+    </View>
+  )}
+
+  {/* كارد الخيارات */}
+  {!showMiniHeader && selectedMain === 'aqarat' && (
+    <View style={styles.optionsCard}>
+      <View style={styles.buttonRow}>
+        <Pressable
+          onPress={() => setSelectedOption('sale')}
+          style={[styles.subButton, selectedOption === 'sale' ? styles.subButtonActive : styles.subButtonInactive]}
+        >
+          <Text style={[styles.btnText, selectedOption === 'sale' ? styles.subBtnTextActive : styles.subBtnTextInactive]}>
+            للبيع
+          </Text>
+        </Pressable>
+
+        <Pressable
+          onPress={() => setSelectedOption('rent')}
+          style={[styles.subButton, selectedOption === 'rent' ? styles.subButtonActive : styles.subButtonInactive]}
+        >
+          <Text style={[styles.btnText, selectedOption === 'rent' ? styles.subBtnTextActive : styles.subBtnTextInactive]}>
+            للإيجار
+          </Text>
+        </Pressable>
+      </View>
+      <View style={styles.divider} />
+
+      <View style={styles.searchContainer}>
+        <MaterialIcons name="search" size={20} color="#2e7d32" style={{ marginRight: 8 }} />
+        <TextInput
+          placeholder="بحث..."
+          style={styles.searchInputWithIcon}
+          placeholderTextColor="#2e7d32"
         />
+      </View>
+    </View>
+  )}
 
-        {/* الكارد الرئيسي */}
-        {!showMiniHeader && (
-          <View style={styles.floatingCard}>
-            <View style={styles.buttonRow}>
-              <Pressable
-                onPress={() => setSelectedMain('aqarat')}
-                style={[
-                  styles.mainButton,
-                  selectedMain === 'aqarat' && styles.activeBtnGreen,
-                ]}
-              >
-                <Text style={[styles.btnText, selectedMain === 'aqarat' && { color: '#fff' }]}>
-                  عقارات
-                </Text>
-              </Pressable>
+  {!showMiniHeader && selectedMain === 'projects' && (
+    <View style={styles.optionsCard}>
+      <TextInput
+        placeholder="بحث..."
+        style={styles.searchInput}
+        placeholderTextColor="#666"
+      />
+    </View>
+  )}
 
-              <Pressable
-                onPress={() => setSelectedMain('projects')}
-                style={[
-                  styles.mainButton,
-                  selectedMain === 'projects' && styles.activeBtnGreen,
-                ]}
-              >
-                <Text style={[styles.btnText, selectedMain === 'projects' && { color: '#fff' }]}>
-                  مشاريع جديدة
-                </Text>
-              </Pressable>
-            </View>
-          </View>
-        )}
+  {/* مساحة افتراضية للتمرير */}
+  <View style={{ height: 20 }} />
 
-        {/* كارد الخيارات */}
-        {!showMiniHeader && selectedMain === 'aqarat' && (
-          <View style={styles.optionsCard}>
-            <View style={styles.buttonRow}>
-              <Pressable
-                onPress={() => setSelectedOption('sale')}
-                style={[
-                  styles.subButton,
-                  selectedOption === 'sale' ? styles.subButtonActive : styles.subButtonInactive,
-                ]}
-              >
-                <Text style={[
-                  styles.btnText,
-                  selectedOption === 'sale' ? styles.subBtnTextActive : styles.subBtnTextInactive
-                ]}>
-                  للبيع
-                </Text>
-              </Pressable>
+  {/* عنصر المفضلة وزر المحفوظات - دائم الظهور */}
+  {firstFavorite && (
+    <View style={{ padding: 16, marginBottom: 80 }}>
+      <View key={firstFavorite._id} style={{ marginBottom: 20 }}>
+        <PropertyCard
+          item={{
+            ...firstFavorite,
+            images: firstFavorite.images?.[0]
+              ? firstFavorite.images[0].includes(',')
+                ? firstFavorite.images[0].split(',').map((img: string) => img.trim())
+                : firstFavorite.images
+              : [],
+            bedrooms: firstFavorite.bedrooms ?? 0,
+            bathrooms: firstFavorite.bathrooms ?? 0,
+            area: firstFavorite.area ?? 0,
+            price: firstFavorite.price ?? 0,
+            id: firstFavorite._id,
+            deliveryDate: firstFavorite.deliveryDate ?? new Date().toISOString(),
+            advancePayment: firstFavorite.advancePayment ?? 0,
+            contact: {
+              phone: firstFavorite.contact?.phone ?? 'غير متوفر',
+              email: firstFavorite.contact?.email ?? 'غير متوفر',
+            },
+          }}
+          onPress={() => router.push(`/property/${firstFavorite._id}`)}
+        />
+      </View>
 
-              <Pressable
-                onPress={() => setSelectedOption('rent')}
-                style={[
-                  styles.subButton,
-                  selectedOption === 'rent' ? styles.subButtonActive : styles.subButtonInactive,
-                ]}
-              >
-                <Text style={[
-                  styles.btnText,
-                  selectedOption === 'rent' ? styles.subBtnTextActive : styles.subBtnTextInactive
-                ]}>
-                  للإيجار
-                </Text>
-              </Pressable>
-            </View>
-            <View style={styles.divider} />
+      <Pressable
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingVertical: 10,
+          backgroundColor: '#2e7d32',
+          borderRadius: 8,
+        }}
+        onPress={() => router.push('/save')}
+      >
+        <Ionicons name="heart" size={20} color="#fff" style={{ marginRight: 6 }} />
+        <Text style={{ color: '#fff', fontWeight: 'bold' }}>عرض المحفوظات</Text>
+      </Pressable>
+    </View>
+  )}
 
-            <View style={styles.searchContainer}>
-              <MaterialIcons name="search" size={20} color="#2e7d32" style={{ marginRight: 8 }} />
-              <TextInput
-                placeholder="بحث..."
-                style={styles.searchInputWithIcon}
-                placeholderTextColor="#2e7d32"
-              />
-            </View>
-          </View>
-        )}
+</ScrollView>
 
-        {!showMiniHeader && selectedMain === 'projects' && (
-          <View style={styles.optionsCard}>
-            <TextInput
-              placeholder="بحث..."
-              style={styles.searchInput}
-              placeholderTextColor="#666"
-            />
-          </View>
-        )}
-
-        {/* مساحة افتراضية للتمرير */}
-        <View style={{ height: 800 }} />
-      </ScrollView>
     </View>
   );
 }
@@ -401,12 +522,12 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   searchInput: {
-  backgroundColor: '#fff',
-  paddingVertical: 12,
-  paddingHorizontal: 12,
-  borderRadius: 10,
-  fontSize: 16,
-},
+    backgroundColor: '#fff',
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    fontSize: 16,
+  },
 
   mainButton: {
     flex: 1,
@@ -471,7 +592,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height:'15%',
+    height: '15%',
     backgroundColor: '#dff4e3ff',
     padding: 10,
     zIndex: 10,
@@ -480,5 +601,5 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  
+
 });
