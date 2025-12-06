@@ -1,10 +1,11 @@
 
 
+import 'react-native-reanimated';
+
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Provider as PaperProvider } from 'react-native-paper';
-import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
@@ -34,6 +35,9 @@ export default function RootLayout() {
                   <Stack.Screen name="Register" options={{ title: 'Register' }} />
                   <Stack.Screen name="Login" options={{ title: 'Login' }} />
                                     <Stack.Screen name="updateUser" options={{ title: 'updateUser' }} />
+                                     <Stack.Screen name="add" options={{ title: 'إضافة عقار' }} />
+  {/* <Stack.Screen name="edit" options={{ title: 'تعديل العقار' }} />
+  <Stack.Screen name="list" options={{ title: 'قائمة العقارات' }} /> */}
 
                 </Stack>
                 <StatusBar style="auto" />

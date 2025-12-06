@@ -18,6 +18,7 @@ interface AuthState {
   phone: string | null;
   loading: boolean;
   isLoggedIn: boolean;
+  role?: string | null
 }
 
 // ===== Initial State =====
@@ -27,6 +28,8 @@ const initialState: AuthState = {
   phone: null,
   loading: false,
   isLoggedIn: false,
+  role: null,
+
 };
 
 // ===== Thunks =====
@@ -98,6 +101,7 @@ const authSlice = createSlice({
 
       // Login
       .addCase(login.pending, (state) => { state.loading = true; })
+      // Login
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
@@ -105,15 +109,23 @@ const authSlice = createSlice({
         state.phone = action.payload.phone || action.payload.user?.phone || null;
         state.isLoggedIn = true;
 
+        // احفظ role أيضًا
+        const role = action.payload.role || action.payload.user?.role || 'user';
+
         AsyncStorage.setItem(
           "auth",
           JSON.stringify({
             user: state.user,
             token: state.token,
             phone: state.phone,
+            role: role, // إضافة هذا السطر
           })
         );
+
+        // احتفظ بالـ role في الـ state إذا أردت
+        state.role = role;
       })
+
       .addCase(login.rejected, (state) => { state.loading = false; })
 
       // Update User

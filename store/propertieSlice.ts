@@ -9,19 +9,21 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 // ===== Types =====
 export type PropertyData = {
-  phone: string | undefined;
+  phone?: string | undefined;
   _id?: string;
   title: string;
   description?: string;
   type: "apartment" | "villa" | "room" | "student_housing";
   transactionType: "للبيع" | "للايجار";
   price: number;
+    installmentMonths?: number; // ✅ أضفه هنا
+
   advancePayment?: number;
   location: {
     country: string;
     city: string;
     street?: string;
-    neighborhood?: string;
+    district?: string;
     postalCode?: string;
     address: string;
     coordinates?: { lat: number; lng: number };
