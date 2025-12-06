@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useAuth';
 import i18n, { loadLocale, setLocale } from '@/i18n';
 import { logout } from '@/store/authSlice';
 import { clearFavoritesState } from '@/store/favoritesSlice';
+import { fetchUserNotifications } from '@/store/notificationsSlice';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as Updates from 'expo-updates';
@@ -25,6 +26,7 @@ export default function MoreScreen() {
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const [selectedLang, setSelectedLang] = useState<'en' | 'ar'>(i18n.locale.startsWith('ar') ? 'ar' : 'en');
 
+console.log(token,isLoggedIn,'token');
 
   useEffect(() => {
     const init = async () => {
@@ -67,9 +69,19 @@ export default function MoreScreen() {
 
   const handleLogout = () => {
     dispatch(logout());
-      dispatch(clearFavoritesState());
+    dispatch(clearFavoritesState());
 
   };
+
+  const { notifications } = useAppSelector((state) => state.notifications);
+
+  useEffect(() => {
+    if (user && token) {
+      dispatch(fetchUserNotifications(token));
+    }
+  }, [user, token]);
+
+    const unreadCount = notifications.filter(n => !n.readBy.includes(user?._id)).length;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? '#121212' : '#fff' }}>
@@ -87,7 +99,7 @@ export default function MoreScreen() {
             style={styles.headerImage}
           />
 
-          {!isLoggedIn && !token? (
+          {!isLoggedIn && !token ? (
             <Button
               mode="contained"
               style={[styles.loginButton, { backgroundColor: isDark ? '#6c5ce7' : '#1b4414ff' }]}
@@ -118,13 +130,21 @@ export default function MoreScreen() {
             iconOpacity={0.4}
             onPress={() => router.push("/updateUser")}
           />
-          <MoreItem icon="notifications-outline" title={i18n.t('notifications')} onPress={() => { }} iconOpacity={0.4} />
+          <MoreItem icon="notifications-outline" title={i18n.t('notifications')} onPress={() => router.push("/notifications")} iconOpacity={0.4} />
           <MoreItem icon="language-outline" title={i18n.t('language')} onPress={() => setLanguageModalVisible(true)} iconOpacity={0.4} />
           <MoreItem icon="newspaper-outline" title={i18n.t('blog')} onPress={() => { }} iconOpacity={0.4} />
           <MoreItem icon="call-outline" title={i18n.t('contact')} onPress={() => { }} iconOpacity={0.4} />
           <MoreItem icon="information-circle-outline" title={i18n.t('about')} onPress={() => { }} iconOpacity={0.4} />
           <MoreItem icon="shield-checkmark-outline" title={i18n.t('privacy')} onPress={() => { }} iconOpacity={0.4} />
-          <MoreItem icon="log-out-outline" title={i18n.t('log_out')} onPress={handleLogout} iconOpacity={0.4} />
+       {token && (
+  <MoreItem
+    icon="log-out-outline"
+    title={i18n.t('log_out')}
+    onPress={handleLogout}
+    iconOpacity={0.4}
+  />
+)}
+
         </View>
 
         {/* Modal اختيار اللغة */}

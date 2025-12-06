@@ -5,13 +5,18 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { persistReducer, persistStore } from "redux-persist";
 import authReducer from "./authSlice";
 import favoriteReducer from "./favoritesSlice";
+import notificationsReducer from "./notificationsSlice"; // ← إضافة slice الإشعارات
 import propertyReducer from "./propertieSlice";
-
+const notificationsPersistConfig = {
+  key: "notifications",
+  storage: AsyncStorage,
+  whitelist: ["notifications"], // حفظ الإشعارات فقط
+};
 // إعدادات persist الخاصة بـ auth فقط
 const authPersistConfig = {
   key: "auth",
   storage: AsyncStorage,
-  whitelist: ["user", "token", "phone"],   // القيم التي نريد حفظها فقط
+  whitelist: ["user", "token", "phone", "role"],
   blacklist: ["loading", "isLoggedIn"],    // عدم حفظ الحالة المتغيرة
 };
 
@@ -19,6 +24,8 @@ const authPersistConfig = {
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   property: propertyReducer,
+    notifications: persistReducer(notificationsPersistConfig, notificationsReducer), // ← إضافة persist للإشعارات
+
   favorites: favoriteReducer,     // ← إضافة المفضلة
 
 });

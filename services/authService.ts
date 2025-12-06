@@ -6,7 +6,18 @@ export const registerUser = async (data: { name: string; email: string; phone: s
   return response.data;
 };
 
-export const loginUser = async (data: { email: string; password: string }) => {
+// export const loginUser = async (data: { email: string; password: string }) => {
+//   const response = await axios.post(`${API_URL}/auth/login`, data);
+//   return response.data;
+// };
+export const loginUser = async (data: {
+  email: string;
+  password: string;
+  latitude?: number;
+  longitude?: number;
+  country?: string;
+  city?: string;
+}) => {
   const response = await axios.post(`${API_URL}/auth/login`, data);
   return response.data;
 };

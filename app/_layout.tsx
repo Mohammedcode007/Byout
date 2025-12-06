@@ -40,6 +40,7 @@ export default function RootLayout() {
                     name="contact-owner/[propertyId]"
                     options={{ title: 'اتصل بالمالك' }}
                   />
+                  <Stack.Screen name="notifications" options={{ title: 'notifications' }} />
 
 
 

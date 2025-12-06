@@ -118,7 +118,7 @@ export default function AuthGate({
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   
   // جلب حالة تسجيل الدخول
-  const { isLoggedIn } = useAppSelector(state => state.auth);
+  const { isLoggedIn,token } = useAppSelector(state => state.auth);
 
   const handleRegister = () => {
     navigation.navigate('Register');
@@ -133,7 +133,7 @@ export default function AuthGate({
   };
 
   // إذا كان المستخدم مسجل دخول، عرض المحتوى مباشرة
-  if (isLoggedIn) {
+  if (token) {
     return <>{children}</>;
   }
 
