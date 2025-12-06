@@ -36,7 +36,7 @@ export type PropertyData = {
   contact?: { phone?: string; email?: string };
   deliveryDate?: string;
   featured?: boolean;
-  status?: "ready" | "under_construction";
+status?: "ready" | "under_construction" | "مكتمل" | "قيد الانشاء";
   ownership?: "owned" | "rented" | "student_housing";
   amenities?: Record<string, boolean>;
   images?: string[];
