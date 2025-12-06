@@ -18,6 +18,7 @@ export default function HomeScreen() {
   const [showMiniHeader, setShowMiniHeader] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const role = useSelector((state: RootState) => state.auth.role);
+console.log(role);
 
   const router = useRouter();
 

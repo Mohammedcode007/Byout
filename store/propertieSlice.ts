@@ -17,7 +17,7 @@ export type PropertyData = {
   transactionType: "للبيع" | "للايجار";
   price: number;
     installmentMonths?: number; // ✅ أضفه هنا
-
+uniqueId: string;
   advancePayment?: number;
   location: {
     country: string;

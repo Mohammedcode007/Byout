@@ -40,17 +40,29 @@ export default function PropertyListScreen() {
     currentPage * itemsPerPage
   );
 
-  const handleDelete = (id: string) => {
-    if (!token) return Alert.alert("خطأ", "يجب تسجيل الدخول");
-    Alert.alert("تأكيد", "هل تريد حذف هذا العقار؟", [
-      { text: "إلغاء", style: "cancel" },
-      {
-        text: "حذف",
-        style: "destructive",
-        onPress: () => dispatch(removeProperty({ token, id }))
+const handleDelete = (id: string) => {
+  if (!token) return Alert.alert("خطأ", "يجب تسجيل الدخول");
+
+  Alert.alert("تأكيد", "هل تريد حذف هذا العقار؟", [
+    { text: "إلغاء", style: "cancel" },
+    {
+      text: "حذف",
+      style: "destructive",
+      onPress: () => {
+        dispatch(removeProperty({ token, id }))
+          .unwrap()
+          .then(() => {
+            console.log("تم حذف العقار بنجاح:", id);
+          })
+          .catch((err) => {
+            console.error("حدث خطأ عند الحذف:", err);
+            Alert.alert("خطأ", String(err));
+          });
       }
-    ]);
-  };
+    }
+  ]);
+};
+
 
 const handleEdit = (id: string) => {
   router.push({ pathname: "/edit", params: { id } });

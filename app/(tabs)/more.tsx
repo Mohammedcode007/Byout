@@ -87,7 +87,7 @@ export default function MoreScreen() {
             style={styles.headerImage}
           />
 
-          {!isLoggedIn ? (
+          {!isLoggedIn && !token? (
             <Button
               mode="contained"
               style={[styles.loginButton, { backgroundColor: isDark ? '#6c5ce7' : '#1b4414ff' }]}

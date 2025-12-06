@@ -43,6 +43,7 @@ export default function EditScreen() {
   const dispatch = useDispatch<AppDispatch>();
   const token = useSelector((state: RootState) => state.auth.token);
   const property = useSelector((state: RootState) => state.property.property);
+console.log(token);
 
   const [form, setForm] = useState({
     title: "", description: "", type: "", installmentMonths: "",

@@ -34,10 +34,14 @@ export default function RootLayout() {
                   <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
                   <Stack.Screen name="Register" options={{ title: 'Register' }} />
                   <Stack.Screen name="Login" options={{ title: 'Login' }} />
-                                    <Stack.Screen name="updateUser" options={{ title: 'updateUser' }} />
-                                     <Stack.Screen name="add" options={{ title: 'إضافة عقار' }} />
-  {/* <Stack.Screen name="edit" options={{ title: 'تعديل العقار' }} />
-  <Stack.Screen name="list" options={{ title: 'قائمة العقارات' }} /> */}
+                  <Stack.Screen name="updateUser" options={{ title: 'updateUser' }} />
+                  <Stack.Screen name="add" options={{ title: 'إضافة عقار' }} />
+                  <Stack.Screen
+                    name="contact-owner/[propertyId]"
+                    options={{ title: 'اتصل بالمالك' }}
+                  />
+
+
 
                 </Stack>
                 <StatusBar style="auto" />

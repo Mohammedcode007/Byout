@@ -21,7 +21,7 @@
 //   const dispatch = useAppDispatch();
 //   const { properties, loading, error } = useAppSelector((state) => state.property);
 
- 
+
 // useFocusEffect(
 //   useCallback(() => {
 //     dispatch(fetchProperties());
@@ -122,7 +122,7 @@ export default function SearchScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const backgroundColor = isDark ? '#121212' : '#fff';
-  const scrollY = useContext(ScrollYContext); 
+  const scrollY = useContext(ScrollYContext);
 
   const dispatch = useAppDispatch();
   const token = useAppSelector(state => state.auth.token);
@@ -137,11 +137,12 @@ export default function SearchScreen() {
       }
     }, [dispatch, token])
   );
-const favorites = useAppSelector(selectFavorites);
+  const favorites = useAppSelector(selectFavorites);
 
-useEffect(() => {
-  console.log("Favorites updated:", favorites);
-}, [favorites]);
+  useEffect(() => {
+    console.log("Favorites updated:", favorites);
+  }, [favorites]);
+  const ownerEmail = 'code.hassan.1992@gmail.com'
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor }}>
       <Animated.ScrollView
@@ -188,7 +189,11 @@ useEffect(() => {
                     area: property.area ?? 0,
                     price: property.price ?? 0,
                     id: property._id,
-                    phone:property.phone,
+                    phone: property.phone,
+                    uniqueId: property.uniqueId,
+                    ownerEmail: property.contact?.email,
+                    ownerName: property.title,
+                    propertyTitle: property.title,
                     deliveryDate: property.deliveryDate ?? new Date().toISOString(),
                     advancePayment: property.advancePayment ?? 0,
                     contact: {

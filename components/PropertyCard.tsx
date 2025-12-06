@@ -20,8 +20,11 @@ interface PropertyAPI {
   status?: string;
   id?: string;
   phone?: string;
-
+  uniqueId?: string;
   deliveryDate?: string;
+  ownerEmail?: string;
+  ownerName?: string;
+  propertyTitle?: string;
   featured?: boolean;
   advancePayment?: number;
   amenities?: Record<string, boolean>;
@@ -47,7 +50,11 @@ const PropertyCard: React.FC<PropertyProps> = ({ item, onPress }) => {
     title = '',
     phone,
     status = '',
+    uniqueId = '',
     deliveryDate,
+    ownerEmail,
+    ownerName,
+    propertyTitle,
     advancePayment = 0,
     featured = false,
     contact = {},
@@ -187,6 +194,10 @@ const PropertyCard: React.FC<PropertyProps> = ({ item, onPress }) => {
       <ContactButtons
         subTextColor='#005d64'
         contactBackground='#e5eff0'
+        uniqueId={uniqueId}
+        ownerEmail={ownerEmail}
+        ownerName={ownerName}
+        propertyTitle={propertyTitle}
         onPressEmail={() => console.log(contact.email ?? 'لا يوجد بريد')}
         onPressCall={handleCallPress}
       />
