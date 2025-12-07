@@ -278,7 +278,7 @@ const AnimatedTabIcon = ({
         borderRadius: 25,
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'hidden',
+        overflow: 'hidden', 
       }}
     >
       {/* الخلفية المتحركة */}

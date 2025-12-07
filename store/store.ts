@@ -7,6 +7,8 @@ import authReducer from "./authSlice";
 import favoriteReducer from "./favoritesSlice";
 import notificationsReducer from "./notificationsSlice"; // ← إضافة slice الإشعارات
 import propertyReducer from "./propertieSlice";
+import usersReducer from "./usersSlice"; // ✅ إضافة users slice
+
 const notificationsPersistConfig = {
   key: "notifications",
   storage: AsyncStorage,
@@ -24,7 +26,8 @@ const authPersistConfig = {
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   property: propertyReducer,
-    notifications: persistReducer(notificationsPersistConfig, notificationsReducer), // ← إضافة persist للإشعارات
+  notifications: persistReducer(notificationsPersistConfig, notificationsReducer), // ← إضافة persist للإشعارات
+  users: usersReducer, // ✅ إضافة users reducer
 
   favorites: favoriteReducer,     // ← إضافة المفضلة
 

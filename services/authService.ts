@@ -42,3 +42,11 @@ export const updateProfile = async (
   });
   return response.data;
 };
+export const updateDeviceTokenAPI = async (token: string, deviceToken: string) => {
+  const res = await axios.post(
+    `${API_URL}/users/device-token`,
+    { deviceToken },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return res.data; // { success: true, message: "تم حفظ التوكن" }
+};

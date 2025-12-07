@@ -172,10 +172,8 @@ export const fetchFavorites = createAsyncThunk(
   async (token: string, thunkAPI) => {
     try {
       const res = await apiGetFavorites(token);
-      console.log("[Favorites] Fetched favorites:", res.favorites);
       return res.favorites || [];
     } catch (e: any) {
-      console.error("[Favorites] Fetch error:", e.response?.data || e.message);
       return thunkAPI.rejectWithValue(e.response?.data?.message || "Fetch Favorites Error");
     }
   }
@@ -189,15 +187,12 @@ export const addToFavorites = createAsyncThunk(
       const state: any = thunkAPI.getState();
       const exists = state.favorites?.favorites?.find((fav: PropertyType) => fav._id === property._id);
       if (exists) {
-        console.log("[Favorites] Property already in favorites:", property._id);
         return thunkAPI.rejectWithValue("العقار موجود بالفعل في المفضلة");
       }
 
       const res = await apiAddFavorite(token, property._id);
-      console.log("[Favorites] Added to favorites:", property._id, res.message);
       return property;
     } catch (e: any) {
-      console.error("[Favorites] Add error:", e.response?.data || e.message);
       return thunkAPI.rejectWithValue(e.response?.data?.message || "Add Favorite Error");
     }
   }
@@ -209,10 +204,8 @@ export const removeFromFavorites = createAsyncThunk(
   async ({ token, propertyId }: { token: string; propertyId: string }, thunkAPI) => {
     try {
       const res = await apiRemoveFavorite(token, propertyId);
-      console.log("[Favorites] Removed from favorites:", propertyId, res.message);
       return propertyId;
     } catch (e: any) {
-      console.error("[Favorites] Remove error:", e.response?.data || e.message);
       return thunkAPI.rejectWithValue(e.response?.data?.message || "Remove Favorite Error");
     }
   }
@@ -228,7 +221,6 @@ const favoritesSlice = createSlice({
       state.favorites = [];
       state.loading = false;
       state.error = null;
-      console.log("[Favorites] Cleared favorites state only");
     },
   },
   extraReducers: (builder) => {

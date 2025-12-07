@@ -240,17 +240,14 @@ export default function HomeScreen() {
                   <Text style={styles.menuText}>إضافة عقار</Text>
                 </Pressable>
 
-                {/* <Pressable style={styles.menuItem} onPress={() => router.push('/edit')}>
-        <Text style={styles.menuText}>تعديل</Text>
-      </Pressable>
-
-      <Pressable style={styles.menuItem} onPress={() => router.push('/delete')}>
-        <Text style={styles.menuText}>حذف</Text>
-      </Pressable> */}
 
                 <Pressable style={styles.menuItem} onPress={() => router.push('/list')}>
                   <Text style={styles.menuText}>عرض القائمة</Text>
                 </Pressable>
+                  <Pressable style={styles.menuItem} onPress={() => router.push('/users/list')}>
+                  <Text style={styles.menuText}>المستخدمين</Text>
+                </Pressable>
+                
               </View>
             )}
 
