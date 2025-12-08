@@ -107,3 +107,24 @@ export const deleteUser = async (
   });
   return response.data;
 };
+
+// ==========================
+// حفظ Device Token (Push Notifications)
+// ==========================
+export const saveDeviceToken = async (
+  token: string,
+  deviceToken: string
+) => {
+  const response = await axios.post(
+    `${API_URL}/users/save-device-token`,
+    { deviceToken },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  return response.data;
+};

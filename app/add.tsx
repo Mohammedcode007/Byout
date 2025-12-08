@@ -134,7 +134,8 @@ export default function AddPropertyScreen() {
       status: form.status === 'completed' ? 'مكتمل' : 'قيد الانشاء',
       ownership: form.ownership as "owned" | "rented" | "student_housing",
       amenities: form.amenities,
-      images: imageArray
+      images: imageArray,
+      uniqueId: ''
     };
 
     dispatch(createProperty({ token, data: payload }))
