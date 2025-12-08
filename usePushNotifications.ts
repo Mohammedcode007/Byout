@@ -1,98 +1,101 @@
-import Constants from "expo-constants";
-import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
-import { useEffect, useRef, useState } from "react";
-import { Platform } from "react-native";
+import { saveDeviceToken } from '@/services/userService';
+import { useAppSelector } from '@/store/store';
+import Constants from 'expo-constants';
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import { useEffect, useRef, useState } from 'react';
+import { Platform } from 'react-native';
 
 export interface PushNotificationState {
-  expoPushToken?: Notifications.ExpoPushToken;
+  expoPushToken?: string;
   notification?: Notifications.Notification;
 }
 
-export const usePushNotifications = (): PushNotificationState => {
-
-  // ✅ Handler مطابق للإصدارات الجديدة
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
-  const [expoPushToken, setExpoPushToken] = useState<
-    Notifications.ExpoPushToken | undefined
-  >();
-
-  const [notification, setNotification] = useState<
-    Notifications.Notification | undefined
-  >();
-
+export const usePushNotificationsWithFCM = (): PushNotificationState => {
+  const [expoPushToken, setExpoPushToken] = useState<string | undefined>();
+  const [notification, setNotification] = useState<Notifications.Notification | undefined>();
   const notificationListener = useRef<Notifications.Subscription | null>(null);
   const responseListener = useRef<Notifications.Subscription | null>(null);
+  const token = useAppSelector(state => state.auth.token); // توكن المستخدم
 
-  async function registerForPushNotificationsAsync() {
-    let token;
+  // إعداد Handler للإشعارات
+Notifications.setNotificationHandler({
+  handleNotification: async (): Promise<Notifications.NotificationBehavior> => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    shouldShowBanner: true, // جديد
+    shouldShowList: true,   // جديد
+  }),
+});
 
-    if (Device.isDevice) {
-      const { status: existingStatus } =
-        await Notifications.getPermissionsAsync();
-
-      let finalStatus = existingStatus;
-
-      if (existingStatus !== "granted") {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-
-      if (finalStatus !== "granted") {
-        alert("Failed to get push token for push notification");
-        return;
-      }
-
-      token = await Notifications.getExpoPushTokenAsync({
-        projectId: Constants.expoConfig?.extra?.eas?.projectId,
-      });
-    } else {
-      alert("Must be using a physical device for Push notifications");
-    }
-
-    if (Platform.OS === "android") {
-      await Notifications.setNotificationChannelAsync("default", {
-        name: "default",
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: "#FF231F7C",
-      });
-    }
-
-    return token;
-  }
 
   useEffect(() => {
-    registerForPushNotificationsAsync().then((token) => {
-      if (token) setExpoPushToken(token);
+    const registerForPushNotifications = async () => {
+      try {
+        if (!Device.isDevice) {
+          console.log('❌ Push notifications تعمل فقط على جهاز حقيقي');
+          return;
+        }
+
+        // طلب صلاحيات الإشعارات
+        let { status } = await Notifications.getPermissionsAsync();
+        if (status !== 'granted') {
+          const req = await Notifications.requestPermissionsAsync();
+          status = req.status;
+        }
+
+        if (status !== 'granted') {
+          console.log('❌ لم يتم منح صلاحية الإشعارات');
+          return;
+        }
+
+        // الحصول على Expo Push Token
+        const tokenData = await Notifications.getExpoPushTokenAsync({
+          projectId: Constants.expoConfig?.extra?.eas?.projectId,
+        });
+        const expoToken = tokenData.data;
+
+        // تخزين التوكن محليًا
+        setExpoPushToken(expoToken);
+        console.log('📱 Expo Push Token:', expoToken);
+
+        // إعداد Android channel
+        if (Platform.OS === 'android') {
+          await Notifications.setNotificationChannelAsync('default', {
+            name: 'default',
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: '#FF231F7C',
+          });
+        }
+
+        // إرسال التوكن للباك اند إذا كان متوفر
+        if (token && expoToken) {
+          await saveDeviceToken(token, expoToken);
+          console.log('✅ تم حفظ التوكن في الباك اند');
+        }
+      } catch (err) {
+        console.error('❌ خطأ أثناء تسجيل الإشعارات:', err);
+      }
+    };
+
+    // التسجيل عند تحميل التطبيق أو تغيّر توكن المستخدم
+    if (token) {
+      registerForPushNotifications();
+    }
+
+    // الاستماع للإشعارات المستلمة
+    notificationListener.current = Notifications.addNotificationReceivedListener(setNotification);
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log('Notification response:', response);
     });
 
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        setNotification(notification);
-      });
-
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response);
-      });
-
     return () => {
-      // ✅ الطريقة الصحيحة الجديدة للإلغاء
       notificationListener.current?.remove();
       responseListener.current?.remove();
     };
-  }, []);
+  }, [token]); // ✅ سيعاد التسجيل تلقائيًا عند تغيّر توكن المستخدم
 
-  return {
-    expoPushToken,
-    notification,
-  };
+  return { expoPushToken, notification };
 };

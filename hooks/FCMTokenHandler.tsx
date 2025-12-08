@@ -1,11 +1,17 @@
-import React from 'react';
-import { useFCMToken } from './useFCMToken';
+// FCMTokenHandler.tsx
+import { usePushNotificationsWithFCM } from '@/usePushNotifications';
+import { ReactNode } from 'react';
 
-interface FCMTokenHandlerProps {
-  children: React.ReactNode;
+interface Props {
+  children: ReactNode;
 }
 
-export function FCMTokenHandler({ children }: FCMTokenHandlerProps) {
-  useFCMToken(); // تسجيل التوكن عند تشغيل التطبيق
+export const FCMTokenHandler = ({ children }: Props) => {
+  // هذا سيعمل تلقائيًا عند تحميل التطبيق
+  const { expoPushToken, notification } = usePushNotificationsWithFCM();
+
+  // يمكن هنا عمل أي شيء إضافي مع notification أو expoPushToken إذا احتجت
+  // console.log(notification);
+
   return <>{children}</>;
-}
+};
