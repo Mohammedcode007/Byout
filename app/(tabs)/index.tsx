@@ -53,6 +53,10 @@ export default function HomeScreen() {
   const unreadCount = user
     ? notifications.filter((n) => !n.readBy.includes(user._id)).length
     : 0;
+  //     const { expoPushToken, notification } = usePushNotifications();
+  // const data = JSON.stringify(notification, undefined, 2);
+  // console.log(expoPushToken?.data,"expoPushToken",data);
+  
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
 
