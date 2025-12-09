@@ -21,7 +21,6 @@ export const usePushNotificationsWithFCM = (): PushNotificationState => {
   // إعداد Handler للإشعارات
 Notifications.setNotificationHandler({
   handleNotification: async (): Promise<Notifications.NotificationBehavior> => ({
-    shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
     shouldShowBanner: true, // جديد

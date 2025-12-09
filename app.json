@@ -21,8 +21,7 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.mohammed007007.Byout",
-"googleServicesFile": "@env:ANDROID_GOOGLE_SERVICES_JSON"
-
+  "googleServicesFile": "./android/app/google-services.json"
     },
     "web": {
       "output": "static",
@@ -43,14 +42,14 @@
         }
       ],
       "expo-localization",
-       [
-    "expo-build-properties",
-    {
-      "android": {
-        "usesCleartextTraffic": true
-      }
-    }
-  ]
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

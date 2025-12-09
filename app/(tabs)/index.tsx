@@ -21,7 +21,6 @@ export default function HomeScreen() {
   const dispatch = useAppDispatch();
 
   const { user, token, role, isLoggedIn } = useAppSelector((state) => state.auth);
-  console.log(role);
   useFocusEffect(
     useCallback(() => {
       dispatch(fetchProperties());

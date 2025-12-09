@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "944761712352",
+    "project_id": "bayout-ef528",
+    "storage_bucket": "bayout-ef528.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:944761712352:android:9b00546dacb2927e3eea85",
+        "android_client_info": {
+          "package_name": "com.mohammed007007.Byout"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8HAVkDA44-pHYi60VyGTqh1hM_qU5L1I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

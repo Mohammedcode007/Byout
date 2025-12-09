@@ -1,133 +1,242 @@
-import { Feather, FontAwesome5, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import ContactButtons from '@/components/ContactButtons';
+import { useAppDispatch, useAppSelector } from '@/hooks/useAuth';
+import { addToFavorites, removeFromFavorites, selectFavorites } from '@/store/favoritesSlice';
+import { fetchProperty } from '@/store/propertieSlice';
+import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useMemo, useRef } from 'react';
-import { Dimensions, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { ActivityIndicator, Alert, Dimensions, Image, Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 
 const { height } = Dimensions.get('window');
 
 export default function PropertyDetailScreen() {
   const params = useLocalSearchParams();
-  const id = params.id;
-  
+  const dispatch = useAppDispatch();
+
+  const id =
+    typeof params.id === "string" ? params.id : params.id?.[0];
+  console.log(id, 'id');
+  const { property, loading } = useAppSelector((state) => state.property);
+
+  console.log(property);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchProperty(id));
+    }
+  }, [id]);
+
   const features = [
-    { icon: 'bed-outline', label: '3 غرف نوم' },
-    { icon: 'water-outline', label: '2 حمام' },
-    { icon: 'resize-outline', label: '120 م²' },
-    { icon: 'pricetag-outline', label: 'السعر: 2,500,000 جنيه' },
-    { icon: 'cash-outline', label: 'مقدم: 200,000 جنيه' },
-    { icon: 'calendar-outline', label: 'تاريخ الإضافة: 12/2025' },
-    { icon: 'home-outline', label: 'نوع العقار: للبيع' },
-    { icon: 'construct-outline', label: 'الحالة: قيد الإنشاء' },
-    { icon: 'shield-checkmark-outline', label: 'الملكية: أول سكن' },
+    { icon: 'bed-outline', label: `${property?.bedrooms} غرف نوم` },
+    { icon: 'water-outline', label: `${property?.bathrooms} حمام` },
+    { icon: 'resize-outline', label: `${property?.area} م²` },
+    { icon: 'pricetag-outline', label: `السعر: ${property?.price.toLocaleString()} جنيه` },
+    { icon: 'cash-outline', label: `مقدم: ${property?.advancePayment?.toLocaleString() || 0} جنيه` },
+    { icon: 'calendar-outline', label: `تاريخ التسليم: ${property?.deliveryDate?.split('T')[0]}` },
+    { icon: 'home-outline', label: `نوع العملية: ${property?.transactionType}` },
+    { icon: 'construct-outline', label: `الحالة: ${property?.status}` },
+    { icon: 'shield-checkmark-outline', label: `الملكية: ${property?.ownership}` },
   ];
 
-  const services = [
-    { icon: 'car-sport', label: 'مواقف مغطاة' },
-    { icon: 'paw', label: 'مسموح بالحيوانات' },
-    { icon: 'flash', label: 'عداد كهرباء' },
-    { icon: 'water', label: 'مياه' },
-    { icon: 'fire', label: 'غاز' },
-    { icon: 'phone', label: 'خط هاتف' },
-    { icon: 'pool', label: 'جاكوزي' },
-    { icon: 'sauna', label: 'ساونا' },
-    { icon: 'baby', label: 'رعاية أطفال' },
-    { icon: 'steam', label: 'بخار' },
-    { icon: 'trash', label: 'مكب نفايات' },
-    { icon: 'tree', label: 'حديقة' },
-    { icon: 'coffee', label: 'كافتريا' },
-    { icon: 'broom', label: 'خدمات تنظيف' },
-    { icon: 'tools', label: 'صيانه' },
-    { icon: 'swimming-pool', label: 'مسبح' },
-    { icon: 'dumbbell', label: 'صالة رياضية' },
-    { icon: 'hospital', label: 'مستشفى' },
-  ];
+
+  const services = Object.entries(property?.amenities || {})
+    .filter(([_, value]) => value === true)
+    .map(([key]) => {
+      const map: Record<string, any> = {
+        electricity: { icon: "flash", text: "عداد كهرباء" },
+        water: { icon: "water", text: "مياه" },
+        garden: { icon: "tree", text: "حديقة" },
+        gym: { icon: "dumbbell", text: "صالة رياضية" },
+        pool: { icon: "swimming-pool", text: "مسبح" },
+        hospital: { icon: "hospital", text: "مستشفى" },
+        jacuzzi: { icon: "pool", text: "جاكوزي" },
+        sauna: { icon: "sauna", text: "ساونا" },
+        childcare: { icon: "baby", text: "رعاية أطفال" },
+        cafeteria: { icon: "coffee", text: "كافتريا" },
+        garbage_disposal: { icon: "trash", text: "مكب نفايات" },
+        maintenance: { icon: "tools", text: "صيانة" },
+        phone_line: { icon: "phone", text: "خط هاتف" },
+        steam: { icon: "steam", text: "بخار" },
+      };
+
+      return map[key]
+        ? { icon: map[key].icon, label: map[key].text }
+        : null;
+    })
+    .filter(Boolean);
+
 
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   // Snap points: الثلث السفلي و 3/4 الشاشة
   const snapPoints = useMemo(() => [height / 3, (height * 3) / 4], []);
 
-  const images = [
-    'https://www.contemporist.com/wp-content/uploads/2017/05/modern-house-design-swimming-pool-160517-950-01-800x533.jpg',
-    'https://res.cloudinary.com/stannard-homes/image/fetch/c_fill,g_auto,f_auto,dpr_auto,w_1170,h_617/https://stannard-homes-assets.s3.ap-southeast-2.amazonaws.com/app/uploads/2021/09/19134557/042.jpg',
-    'https://www.thithithara.com/storage/property/images/2656_image_1708220798.jpg',
-  ];
+  const images = property?.images?.length
+    ? property.images
+    : ["https://via.placeholder.com/800x600"];
 
+  const ownerEmail = 'code.hassan.1992@gmail.com'
+  const handleCallPress = async () => {
+
+    const phoneNumber = property?.contact?.phone; // أو استخدم رقم منفصل للاتصال إذا أحببت
+    const url = `tel:${phoneNumber}`;
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert('تنبيه', 'لا يمكن فتح تطبيق الاتصال على هذا الجهاز');
+      }
+    } catch (err) {
+      console.error('Error making call', err);
+      Alert.alert('حدث خطأ', 'تعذر فتح تطبيق الاتصال');
+    }
+  };
+  const handleShare = async () => {
+    try {
+      if (!property) return;
+
+      const message = `
+🏠 ${property.title}
+💰 السعر: ${property.price.toLocaleString()} جنيه
+📍 العنوان: ${property.location.city} - ${property.location.street}
+
+شاهد الإعلان:
+https://byout.app/property/${property._id}
+`;
+
+      await Share.share({ message });
+    } catch (error) {
+      Alert.alert('خطأ', 'تعذر تنفيذ المشاركة');
+    }
+  };
+  const token = useAppSelector(state => state.auth?.token);
+  const favorites = useAppSelector(selectFavorites);
+  const isFavorite = favorites.some(fav => fav._id === id);
+
+  const toggleFavorite = () => {
+    if (!token) {
+      console.log("يجب تسجيل الدخول لإضافة المفضلة");
+      return;
+    }
+    if (!id) {
+      console.log("خطأ: لا يمكن إضافة عقار بدون معرف صحيح");
+      return;
+    }
+    if (isFavorite) {
+      dispatch(removeFromFavorites({ token, propertyId: id }));
+      console.log("تم حذف العقار من المفضلة:", id);
+    } else {
+      dispatch(addToFavorites({ token, property: { ...property, _id: id } }));
+      console.log("تمت إضافة العقار إلى المفضلة:", id);
+    }
+  };
+
+  if (loading) return <ActivityIndicator size="large" />;
+  if (!property) return <Text>لا يوجد بيانات</Text>;
   return (
     <View style={styles.container}>
       {/* الصور أعلى */}
-      <ScrollView style={{ flex: 1 ,marginBottom:height /3}}>
+      <ScrollView style={{ flex: 1, marginBottom: height / 3 }}>
         {images.map((img, index) => (
           <Image key={index} source={{ uri: img }} style={styles.image} />
         ))}
       </ScrollView>
-    <View style={styles.topIcons}>
-  {/* أيقونتان في اليمين */}
-  <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
-    <Pressable style={styles.iconButton} onPress={() => console.log('Heart')}>
-      <Ionicons name="heart-outline" size={28} color="#fff" />
-    </Pressable>
-    <Pressable style={styles.iconButton} onPress={() => console.log('Share')}>
-      <Feather name="share-2" size={28} color="#fff" />
-    </Pressable>
-  </View>
+      <View style={[styles.topIcons,{flexDirection : token ? 'row-reverse' :'row'}]}>
+        {/* أيقونتان في اليمين */}
+        {token && (
+          <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+            <Pressable style={styles.iconButton} onPress={toggleFavorite}>
+              <Ionicons
+                name={isFavorite ? "heart" : "heart-outline"}
+                size={28}
+                color={isFavorite ? "red" : "#fff"}
+              />
+            </Pressable>
 
-  {/* أيقونة على اليسار */}
-  <Pressable style={styles.iconButton} onPress={() => console.log('Back')}>
-    <Ionicons name="arrow-back" size={28} color="#fff" />
-  </Pressable>
-</View>
+            <Pressable style={styles.iconButton} onPress={handleShare}>
+              <Feather name="share-2" size={28} color="#fff" />
+            </Pressable>
+          </View>
+
+        )}
+
+
+
+
+        {/* أيقونة على اليسار */}
+        <Pressable style={styles.iconButton} onPress={() => console.log('Back')}>
+          <Ionicons name="arrow-back" size={28} color="#fff" />
+        </Pressable>
+      </View>
 
       {/* Bottom Sheet */}
-<BottomSheet
-  ref={bottomSheetRef}
-  index={0}
-  snapPoints={snapPoints}
-  enablePanDownToClose={false}
-  backgroundStyle={styles.bottomSheet}
-  handleIndicatorStyle={styles.pullIcon}
->
-  <BottomSheetScrollView contentContainerStyle={{ padding: 16 }}>
-    {/* العنوان والوصف */}
-    <Text style={styles.title}>شقة للبيع في القاهرة</Text>
-    <Text style={styles.address}>العنوان: حي الزمالك، القاهرة</Text>  
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={0}
+        snapPoints={snapPoints}
+        enablePanDownToClose={false}
+        backgroundStyle={styles.bottomSheet}
+        handleIndicatorStyle={styles.pullIcon}
+      >
+        <BottomSheetScrollView contentContainerStyle={{ padding: 16 }}>
+          {/* العنوان والوصف */}
+          <Text style={styles.title}>{property.title}</Text>
+          <Text style={styles.address}>
+            العنوان: {property.location.street} - {property.location.city}
+          </Text>
 
-    <Text style={styles.description}>
-      شقة رائعة بموقع ممتاز، قريبة من الخدمات، تصميم عصري، ومناسبة للعائلات.
-    </Text>
-
-    <View style={styles.divider} />
-
-    {/* مميزات العقار */}
-    <Text style={styles.sectionTitle}>مميزات العقار</Text>
-    <View style={styles.featuresGrid}>
-      {features.map((item, i) => (
-        <View key={i} style={styles.featureItem}>
-          <Ionicons name={item.icon as any} size={18} color="#003366" style={{ marginLeft: 4 }} />
-          <Text style={styles.featureText}>{item.label}</Text>
-        </View>
-      ))}
-    </View>
-
-    <View style={styles.divider} />
-
-    {/* الخدمات والمرافق */}
-    <Text style={styles.sectionTitle}>الخدمات والمرافق</Text>
-<View style={styles.servicesGrid}>
-  {services.map((item, i) => (
-    <View key={i} style={styles.serviceItem}>
-      <MaterialCommunityIcons name={item.icon as any} size={18} color="#003366" style={{ marginLeft: 4 }} />
-      <Text style={styles.serviceText}>{item.label}</Text>
-    </View>
-  ))}
-</View>
+          <Text style={styles.description}>{property.description}</Text>
 
 
-    <View style={styles.divider} />
+          <View style={styles.divider} />
 
-    {/* أزرار الاتصال */}
-    <View style={styles.buttonsRow}>
+          {/* مميزات العقار */}
+          <Text style={styles.sectionTitle}>مميزات العقار</Text>
+          <View style={styles.featuresGrid}>
+            {features.map((item, i) => (
+              <View key={i} style={styles.featureItem}>
+                <Ionicons name={item.icon as any} size={18} color="#003366" style={{ marginLeft: 4 }} />
+                <Text style={styles.featureText}>{item.label}</Text>
+              </View>
+            ))}
+          </View>
+
+          <View style={styles.divider} />
+
+          {/* الخدمات والمرافق */}
+          <Text style={styles.sectionTitle}>الخدمات والمرافق</Text>
+          <View style={styles.servicesGrid}>
+            {services?.map((item, i) => (
+              <View key={i} style={styles.serviceItem}>
+                <MaterialCommunityIcons
+                  name={item?.icon}
+                  size={18}
+                  color="#003366"
+                  style={{ marginLeft: 4 }}
+                />
+                <Text style={styles.serviceText}>{item?.label}</Text>
+              </View>
+            ))}
+
+          </View>
+
+
+          <View style={styles.divider} />
+
+          {/* أزرار الاتصال */}
+          <ContactButtons
+            subTextColor='#005d64'
+            contactBackground='#e5eff0'
+            uniqueId={property.uniqueId}
+            ownerEmail={ownerEmail}
+            // ownerName={ownerName}
+            propertyTitle={property.title}
+            // onPressEmail={() => console.log(contact.email ?? 'لا يوجد بريد')}
+            onPressCall={handleCallPress}
+          />
+          {/* <View style={styles.buttonsRow}>
       <View style={styles.contactButton}>
         <FontAwesome5 name="whatsapp" size={16} color="#fff" />
         <Text style={styles.buttonText}>واتس آب</Text>
@@ -140,9 +249,9 @@ export default function PropertyDetailScreen() {
         <Ionicons name="mail-outline" size={16} color="#fff" />
         <Text style={styles.buttonText}>إيميل</Text>
       </View>
-    </View>
-  </BottomSheetScrollView>
-</BottomSheet>
+    </View> */}
+        </BottomSheetScrollView>
+      </BottomSheet>
 
     </View>
   );
@@ -150,8 +259,8 @@ export default function PropertyDetailScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
-  image: { width: '100%', height: height / 3, resizeMode: 'cover',marginBottom:10 },
-   bottomSheet: {
+  image: { width: '100%', height: height / 3, resizeMode: 'cover', marginBottom: 10 },
+  bottomSheet: {
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     backgroundColor: '#F7F8FA',
@@ -189,7 +298,7 @@ const styles = StyleSheet.create({
   featureText: { fontSize: 14, color: '#003366', fontWeight: '500', textAlign: 'right' },
 
   // الخدمات والمرافق: قائمة عادية
- 
+
 
   // أزرار الاتصال
   buttonsRow: { flexDirection: 'row-reverse', justifyContent: 'space-between', marginTop: 10 },
@@ -203,29 +312,29 @@ const styles = StyleSheet.create({
   },
   buttonText: { color: '#003366', fontWeight: '600', marginRight: 6 },
   servicesGrid: {
-  flexDirection: 'row-reverse',
-  flexWrap: 'wrap',
-  justifyContent: 'space-between',
-  marginBottom: 12,
-},
-serviceItem: {
-  width: '48%',
-  flexDirection: 'row-reverse',
-  alignItems: 'center',
-  paddingVertical: 8,
-  paddingHorizontal: 12,
-  borderRadius: 12,
-  marginBottom: 8,
-},
-serviceText: { fontSize: 14, color: '#003366', fontWeight: '700', textAlign: 'right' },
- topIcons: {
-  position: 'absolute',
-  top: 10,
-  width: '100%',
-  flexDirection: 'row-reverse',
-  justifyContent: 'space-between', // أيقونات اليمين واليسار متباعدة
-  paddingHorizontal: 16,
-},
+    flexDirection: 'row-reverse',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  serviceItem: {
+    width: '48%',
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  serviceText: { fontSize: 14, color: '#003366', fontWeight: '700', textAlign: 'right' },
+  topIcons: {
+    position: 'absolute',
+    top: 10,
+    width: '100%',
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between', // أيقونات اليمين واليسار متباعدة
+    paddingHorizontal: 16,
+  },
 
   iconButton: {
     backgroundColor: 'rgba(0,0,0,0.4)',
@@ -233,10 +342,10 @@ serviceText: { fontSize: 14, color: '#003366', fontWeight: '700', textAlign: 'ri
     borderRadius: 30,
   },
   address: {
-  fontSize: 14,
-  color: '#666',
-  marginBottom: 6,
-  textAlign: 'right', // من اليمين لليسار
-},
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 6,
+    textAlign: 'right', // من اليمين لليسار
+  },
 
 });

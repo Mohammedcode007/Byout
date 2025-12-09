@@ -86,7 +86,6 @@ import { PersistGate } from 'redux-persist/integration/react';
 
 Notifications.setNotificationHandler({
   handleNotification: async (): Promise<Notifications.NotificationBehavior> => ({
-    shouldShowAlert: true,      // عرض الإشعار على الشاشة
     shouldPlaySound: true,      // تشغيل الصوت
     shouldShowBanner: true,     // ظهور بانر (iOS 14+)
     shouldShowList: true,       // ظهور في قائمة الإشعارات (iOS 16+)
@@ -101,20 +100,27 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   // مستمع للإشعارات أثناء فتح التطبيق
-  useEffect(() => {
-    const subscription = Notifications.addNotificationReceivedListener(notification => {
-      console.log('Notification received:', notification);
+ useEffect(() => {
+  const subscription = Notifications.addNotificationReceivedListener(notification => {
+    const data = notification.request.content.data;
+    console.log('Notification received:', {
+      title: notification.request.content.title,
+      body: notification.request.content.body,
+      data: data,
+    });
+  });
+
+  const responseSubscription =
+    Notifications.addNotificationResponseReceivedListener(response => {
+      const data = response.notification.request.content.data;
+      console.log('User tapped notification:', data);
     });
 
-    const responseSubscription = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log('User tapped notification:', response);
-    });
-
-    return () => {
-      subscription.remove();
-      responseSubscription.remove();
-    };
-  }, []);
+  return () => {
+    subscription.remove();
+    responseSubscription.remove();
+  };
+}, []);
 
   return (
     <Provider store={store}>
