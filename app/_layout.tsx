@@ -78,6 +78,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { FCMTokenHandler } from '@/hooks/FCMTokenHandler';
 import { persistor, store } from '@/store/store';
+import registerNNPushToken from 'native-notify';
 import { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -98,6 +99,7 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+registerNNPushToken(32869, 'SRdHaG8mbGIXMm0ZDWPfoA');
 
   // مستمع للإشعارات أثناء فتح التطبيق
  useEffect(() => {

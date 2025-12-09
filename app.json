@@ -21,7 +21,7 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.mohammed007007.Byout",
-  "googleServicesFile": "./android/app/google-services.json"
+"googleServicesFile": "./google-services.json"
     },
     "web": {
       "output": "static",
@@ -60,6 +60,7 @@
       "eas": {
         "projectId": "bb9dbade-a8b9-49b4-8318-5189b1a508f6"
       }
-    }
+    },
+    "owner": "mohammed007007"
   }
 }
