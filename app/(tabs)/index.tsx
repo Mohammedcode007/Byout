@@ -23,16 +23,26 @@ export default function HomeScreen() {
   const { user, token, role, isLoggedIn } = useAppSelector((state) => state.auth);
 
   const [searchText, setSearchText] = useState('');
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     dispatch(fetchProperties({
+  //       search: searchText,
+  //       isStudentHousing: selectedMain === 'studentHousing', // true فقط لو اخترنا سكن طلاب
+  //     }));
+  //     if (token) {
+  //       dispatch(fetchFavorites(token));
+  //     }
+  //   }, [dispatch, token, selectedMain, searchText])
+  // );
 useFocusEffect(
   useCallback(() => {
     dispatch(fetchProperties({
-      search: searchText,
-      isStudentHousing: selectedMain === 'studentHousing', // true فقط لو اخترنا سكن طلاب
+      isStudentHousing: selectedMain === 'studentHousing',
     }));
     if (token) {
       dispatch(fetchFavorites(token));
     }
-  }, [dispatch, token, selectedMain, searchText])
+  }, [dispatch, token, selectedMain])
 );
 
   useFocusEffect(
@@ -68,17 +78,18 @@ useFocusEffect(
     : 0;
 
   const { properties, loading, error } = useAppSelector((state) => state.property);
-console.log(properties,'88888888');
-const handleSearchPress = () => {
-  if (properties && properties.length > 0) {
-    router.push({
-      pathname: '/search',
-      params: { q: searchText }
-    });
-  } else {
-    Alert.alert('لا توجد نتائج مطابقة للبحث');
+  console.log(properties, '88888888');
+ const handleSearchPress = () => {
+  if (searchText.trim() === '') {
+    Alert.alert('من فضلك أدخل نص البحث');
+    return;
   }
+  router.push({
+    pathname: '/search',
+    params: { q: searchText }
+  });
 };
+
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -87,10 +98,10 @@ const handleSearchPress = () => {
       {showMiniHeader && (
         <SafeAreaView style={styles.miniHeader}>
           <View style={styles.searchContainer}>
-<Pressable onPress={handleSearchPress}>
-    <MaterialIcons name="search" size={22} color="#2e7d32" style={{ marginRight: 8 }} />
-  </Pressable>       
-       <TextInput
+            <Pressable onPress={handleSearchPress}>
+              <MaterialIcons name="search" size={22} color="#2e7d32" style={{ marginRight: 8 }} />
+            </Pressable>
+            <TextInput
               placeholder="بحث..."
               style={styles.searchInputWithIcon}
               value={searchText}
@@ -192,10 +203,10 @@ const handleSearchPress = () => {
             <View style={styles.divider} />
 
             <View style={styles.searchContainer}>
-<Pressable onPress={handleSearchPress}>
-    <MaterialIcons name="search" size={22} color="#2e7d32" style={{ marginRight: 8 }} />
-  </Pressable>
-                <TextInput
+              <Pressable onPress={handleSearchPress}>
+                <MaterialIcons name="search" size={22} color="#2e7d32" style={{ marginRight: 8 }} />
+              </Pressable>
+              <TextInput
                 placeholder="بحث..."
                 style={styles.searchInputWithIcon}
                 value={searchText}
@@ -207,18 +218,18 @@ const handleSearchPress = () => {
         )}
 
         {!showMiniHeader && selectedMain === 'studentHousing' && (
-       <View style={[styles.optionsCard, { flexDirection: 'row', alignItems: 'center' }]}>
-<Pressable onPress={handleSearchPress}>
-    <MaterialIcons name="search" size={22} color="#2e7d32" style={{ marginRight: 8 }} />
-  </Pressable>  
-  <TextInput
-    placeholder="بحث..."
-    style={[styles.searchInput, { flex: 1 }]} // flex:1 لتملأ المساحة المتبقية
-    value={searchText}
-    onChangeText={setSearchText}
-    placeholderTextColor="#666"
-  />
-</View>
+          <View style={[styles.optionsCard, { flexDirection: 'row', alignItems: 'center' }]}>
+            <Pressable onPress={handleSearchPress}>
+              <MaterialIcons name="search" size={22} color="#2e7d32" style={{ marginRight: 8 }} />
+            </Pressable>
+            <TextInput
+              placeholder="بحث..."
+              style={[styles.searchInput, { flex: 1 }]} // flex:1 لتملأ المساحة المتبقية
+              value={searchText}
+              onChangeText={setSearchText}
+              placeholderTextColor="#666"
+            />
+          </View>
 
         )}
 
