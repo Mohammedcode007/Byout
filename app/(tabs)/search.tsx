@@ -110,10 +110,11 @@ import SearchFilters from '@/components/SearchFilters';
 import { useAppDispatch, useAppSelector } from '@/hooks/useAuth';
 import { fetchFavorites, selectFavorites } from '@/store/favoritesSlice';
 import { fetchProperties } from '@/store/propertieSlice';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { useRouter } from 'expo-router';
-import { useCallback, useContext, useEffect } from 'react';
-import { Animated, ScrollView, Text, useColorScheme, View } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useCallback, useContext, useEffect, useState } from 'react';
+import { Animated, Pressable, ScrollView, Text, TextInput, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollYContext } from './_layout';
 
@@ -127,16 +128,44 @@ export default function SearchScreen() {
   const dispatch = useAppDispatch();
   const token = useAppSelector(state => state.auth.token);
   const { properties, loading, error } = useAppSelector((state) => state.property);
+  const { q } = useLocalSearchParams();
+  const [searchInput, setSearchInput] = useState(''); // النص داخل الحقل
+  const [searchText, setSearchText] = useState('');   // النص الذي يتم به البحث
+  useEffect(() => {
+    if (q) {
+      const value = String(q);
+      setSearchInput(value);
+      setSearchText(value); // أول تحميل يبحث مباشرة
+    }
+  }, [q]);
+
 
   // جلب العقارات والمفضلة عند تحميل الشاشة
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     dispatch(fetchProperties());
+  //     if (token) {
+  //       dispatch(fetchFavorites(token));
+  //     }
+  //   }, [dispatch, token])
+  // );
   useFocusEffect(
     useCallback(() => {
-      dispatch(fetchProperties());
+      dispatch(
+        fetchProperties(
+          searchText
+            ? { search: searchText }
+            : undefined
+        )
+      );
+
       if (token) {
         dispatch(fetchFavorites(token));
       }
-    }, [dispatch, token])
+    }, [dispatch, token, searchText])
   );
+
+
   const favorites = useAppSelector(selectFavorites);
 
   useEffect(() => {
@@ -145,6 +174,7 @@ export default function SearchScreen() {
   const ownerEmail = 'code.hassan.1992@gmail.com'
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor }}>
+
       <Animated.ScrollView
         style={{ flex: 1, backgroundColor, paddingTop: 20 }}
         onScroll={Animated.event(
@@ -154,7 +184,51 @@ export default function SearchScreen() {
         scrollEventThrottle={16}
       >
         <LocationBar onSaveLocation={() => console.log("تم حفظ الموقع")} />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: '#fff',
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: '#ddd',
+            paddingHorizontal: 12,
+            height: 45,
+            marginHorizontal:17,
+            marginBottom:10
+          }}
+        >
+          <Pressable
+            onPress={() => {
+              setSearchText(searchInput);   // تنفيذ البحث
+              router.setParams({ q: searchInput }); // تحديث الرابط
+            }}
+          >
+            <MaterialIcons name="search" size={20} color="#2e7d32" />
+          </Pressable>
+          <TextInput
+            value={searchInput}
+            onChangeText={setSearchInput}
+            placeholder="ابحث..."
+            style={{ flex: 1, marginHorizontal: 10, fontSize: 16 }}
+            placeholderTextColor="#888"
+          />
 
+
+          {/* زر مسح النص */}
+          {searchText.length > 0 && (
+            <Pressable
+              onPress={() => {
+                setSearchInput('');
+                setSearchText('');
+                router.setParams({ q: '' });
+              }}
+            >
+              <MaterialIcons name="close" size={20} color="#888" />
+            </Pressable>
+
+          )}
+        </View>
         <View>
           <SearchFilters
             onFilterPress={(label) => console.log("اخترت:", label)}

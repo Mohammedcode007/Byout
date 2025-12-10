@@ -25,8 +25,11 @@ export default function MoreScreen() {
   const isDark = colorScheme === 'dark';
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const [selectedLang, setSelectedLang] = useState<'en' | 'ar'>(i18n.locale.startsWith('ar') ? 'ar' : 'en');
+const [blogVisible, setBlogVisible] = useState(false);
+const [contactVisible, setContactVisible] = useState(false);
+const [aboutVisible, setAboutVisible] = useState(false);
+const [privacyVisible, setPrivacyVisible] = useState(false);
 
-console.log(token,isLoggedIn,'token');
 
   useEffect(() => {
     const init = async () => {
@@ -132,11 +135,11 @@ console.log(token,isLoggedIn,'token');
           />
           <MoreItem icon="notifications-outline" title={i18n.t('notifications')} onPress={() => router.push("/notifications")} iconOpacity={0.4} />
           <MoreItem icon="language-outline" title={i18n.t('language')} onPress={() => setLanguageModalVisible(true)} iconOpacity={0.4} />
-          <MoreItem icon="newspaper-outline" title={i18n.t('blog')} onPress={() => { }} iconOpacity={0.4} />
-          <MoreItem icon="call-outline" title={i18n.t('contact')} onPress={() => { }} iconOpacity={0.4} />
-          <MoreItem icon="information-circle-outline" title={i18n.t('about')} onPress={() => { }} iconOpacity={0.4} />
-          <MoreItem icon="shield-checkmark-outline" title={i18n.t('privacy')} onPress={() => { }} iconOpacity={0.4} />
-       {token && (
+          <MoreItem icon="newspaper-outline" title={i18n.t('blog')} onPress={() => setBlogVisible(true)} iconOpacity={0.4} />
+<MoreItem icon="call-outline" title={i18n.t('contact')} onPress={() => setContactVisible(true)} iconOpacity={0.4} />
+<MoreItem icon="information-circle-outline" title={i18n.t('about')} onPress={() => setAboutVisible(true)} iconOpacity={0.4} />
+<MoreItem icon="shield-checkmark-outline" title={i18n.t('privacy')} onPress={() => setPrivacyVisible(true)} iconOpacity={0.4} />
+ {token && (
   <MoreItem
     icon="log-out-outline"
     title={i18n.t('log_out')}
@@ -173,6 +176,78 @@ console.log(token,isLoggedIn,'token');
             </View>
           </View>
         </Modal>
+        {/* ===== Modal: Blog ===== */}
+<Modal visible={blogVisible} transparent animationType="slide" onRequestClose={() => setBlogVisible(false)}>
+  <View style={[styles.modalContainer, { backgroundColor: 'rgba(0,0,0,0.4)' }]}>
+    <View style={[styles.modalContent, { backgroundColor: isDark ? '#222' : '#fff' }]}>
+      <Text style={[styles.modalTitle, { color: isDark ? '#fff' : '#000' }]}>{i18n.t('blog')}</Text>
+      <Text style={{ color: isDark ? '#ccc' : '#333', textAlign: 'center', lineHeight: 22 }}>
+        {i18n.locale.startsWith('ar')
+          ? 'يمكنك هنا قراءة أحدث المقالات وأخبار التطبيق.'
+          : 'You can read the latest articles and app news here.'}
+      </Text>
+
+      <Pressable onPress={() => setBlogVisible(false)} style={styles.closeButton}>
+        <Text style={{ color: '#4A90E2' }}>{i18n.locale.startsWith('ar') ? 'إغلاق' : 'Close'}</Text>
+      </Pressable>
+    </View>
+  </View>
+</Modal>
+
+{/* ===== Modal: Contact ===== */}
+<Modal visible={contactVisible} transparent animationType="slide" onRequestClose={() => setContactVisible(false)}>
+  <View style={[styles.modalContainer, { backgroundColor: 'rgba(0,0,0,0.4)' }]}>
+    <View style={[styles.modalContent, { backgroundColor: isDark ? '#222' : '#fff' }]}>
+      <Text style={[styles.modalTitle, { color: isDark ? '#fff' : '#000' }]}>{i18n.t('contact')}</Text>
+      <Text style={{ color: isDark ? '#ccc' : '#333', textAlign: 'center' }}>
+        {i18n.locale.startsWith('ar')
+          ? 'للتواصل معنا: support@example.com'
+          : 'Contact us at: support@example.com'}
+      </Text>
+
+      <Pressable onPress={() => setContactVisible(false)} style={styles.closeButton}>
+        <Text style={{ color: '#4A90E2' }}>{i18n.locale.startsWith('ar') ? 'إغلاق' : 'Close'}</Text>
+      </Pressable>
+    </View>
+  </View>
+</Modal>
+
+{/* ===== Modal: About ===== */}
+<Modal visible={aboutVisible} transparent animationType="slide" onRequestClose={() => setAboutVisible(false)}>
+  <View style={[styles.modalContainer, { backgroundColor: 'rgba(0,0,0,0.4)' }]}>
+    <View style={[styles.modalContent, { backgroundColor: isDark ? '#222' : '#fff' }]}>
+      <Text style={[styles.modalTitle, { color: isDark ? '#fff' : '#000' }]}>{i18n.t('about')}</Text>
+      <Text style={{ color: isDark ? '#ccc' : '#333', textAlign: 'center' }}>
+        {i18n.locale.startsWith('ar')
+          ? 'هذا التطبيق يساعدك في البحث عن أفضل العقارات بسهولة.'
+          : 'This app helps you find the best properties easily.'}
+      </Text>
+
+      <Pressable onPress={() => setAboutVisible(false)} style={styles.closeButton}>
+        <Text style={{ color: '#4A90E2' }}>{i18n.locale.startsWith('ar') ? 'إغلاق' : 'Close'}</Text>
+      </Pressable>
+    </View>
+  </View>
+</Modal>
+
+{/* ===== Modal: Privacy ===== */}
+<Modal visible={privacyVisible} transparent animationType="slide" onRequestClose={() => setPrivacyVisible(false)}>
+  <View style={[styles.modalContainer, { backgroundColor: 'rgba(0,0,0,0.4)' }]}>
+    <View style={[styles.modalContent, { backgroundColor: isDark ? '#222' : '#fff' }]}>
+      <Text style={[styles.modalTitle, { color: isDark ? '#fff' : '#000' }]}>{i18n.t('privacy')}</Text>
+      <Text style={{ color: isDark ? '#ccc' : '#333', textAlign: 'center' }}>
+        {i18n.locale.startsWith('ar')
+          ? 'نحن نحترم خصوصيتك ولا نشارك بياناتك مع أطراف خارجية.'
+          : 'We respect your privacy and do not share your data with third parties.'}
+      </Text>
+
+      <Pressable onPress={() => setPrivacyVisible(false)} style={styles.closeButton}>
+        <Text style={{ color: '#4A90E2' }}>{i18n.locale.startsWith('ar') ? 'إغلاق' : 'Close'}</Text>
+      </Pressable>
+    </View>
+  </View>
+</Modal>
+
       </Animated.ScrollView>
     </SafeAreaView>
   );

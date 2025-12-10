@@ -10,7 +10,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
@@ -66,9 +66,19 @@ useFocusEffect(
   const unreadCount = user
     ? notifications.filter((n) => !n.readBy.includes(user._id)).length
     : 0;
-  //     const { expoPushToken, notification } = usePushNotifications();
-  // const data = JSON.stringify(notification, undefined, 2);
-  // console.log(expoPushToken?.data,"expoPushToken",data);
+
+  const { properties, loading, error } = useAppSelector((state) => state.property);
+console.log(properties,'88888888');
+const handleSearchPress = () => {
+  if (properties && properties.length > 0) {
+    router.push({
+      pathname: '/search',
+      params: { q: searchText }
+    });
+  } else {
+    Alert.alert('لا توجد نتائج مطابقة للبحث');
+  }
+};
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -77,8 +87,10 @@ useFocusEffect(
       {showMiniHeader && (
         <SafeAreaView style={styles.miniHeader}>
           <View style={styles.searchContainer}>
-            <MaterialIcons name="search" size={20} color="#2e7d32" style={{ marginRight: 8 }} />
-            <TextInput
+<Pressable onPress={handleSearchPress}>
+    <MaterialIcons name="search" size={22} color="#2e7d32" style={{ marginRight: 8 }} />
+  </Pressable>       
+       <TextInput
               placeholder="بحث..."
               style={styles.searchInputWithIcon}
               value={searchText}
@@ -180,8 +192,10 @@ useFocusEffect(
             <View style={styles.divider} />
 
             <View style={styles.searchContainer}>
-              <MaterialIcons name="search" size={20} color="#2e7d32" style={{ marginRight: 8 }} />
-              <TextInput
+<Pressable onPress={handleSearchPress}>
+    <MaterialIcons name="search" size={22} color="#2e7d32" style={{ marginRight: 8 }} />
+  </Pressable>
+                <TextInput
                 placeholder="بحث..."
                 style={styles.searchInputWithIcon}
                 value={searchText}
@@ -194,7 +208,9 @@ useFocusEffect(
 
         {!showMiniHeader && selectedMain === 'studentHousing' && (
        <View style={[styles.optionsCard, { flexDirection: 'row', alignItems: 'center' }]}>
-  <Ionicons name="search" size={20} color="#2e7d32" style={{ marginRight: 8 }} />
+<Pressable onPress={handleSearchPress}>
+    <MaterialIcons name="search" size={22} color="#2e7d32" style={{ marginRight: 8 }} />
+  </Pressable>  
   <TextInput
     placeholder="بحث..."
     style={[styles.searchInput, { flex: 1 }]} // flex:1 لتملأ المساحة المتبقية
