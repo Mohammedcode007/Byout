@@ -14,20 +14,34 @@ import { NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSh
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
-  const [selectedMain, setSelectedMain] = useState<'aqarat' | 'projects'>('projects');
+
+  const [selectedMain, setSelectedMain] = useState<'aqarat' | 'studentHousing'>('aqarat');
   const [selectedOption, setSelectedOption] = useState<'sale' | 'rent' | null>("sale");
   const [showMiniHeader, setShowMiniHeader] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const dispatch = useAppDispatch();
-
   const { user, token, role, isLoggedIn } = useAppSelector((state) => state.auth);
+
+  const [searchText, setSearchText] = useState('');
+useFocusEffect(
+  useCallback(() => {
+    dispatch(fetchProperties({
+      search: searchText,
+      isStudentHousing: selectedMain === 'studentHousing', // true فقط لو اخترنا سكن طلاب
+    }));
+    if (token) {
+      dispatch(fetchFavorites(token));
+    }
+  }, [dispatch, token, selectedMain, searchText])
+);
+
   useFocusEffect(
     useCallback(() => {
       dispatch(fetchProperties());
       if (token) {
         dispatch(fetchFavorites(token));
       }
-    }, [dispatch, token])
+    }, [dispatch, token, selectedMain])
   );
   const router = useRouter();
 
@@ -39,14 +53,14 @@ export default function HomeScreen() {
       setShowMiniHeader(false);
     }
   };
-   useEffect(() => {
-      if (user && token) {
-        dispatch(fetchUserNotifications(token));
-      }
-    }, [user, token]);
+  useEffect(() => {
+    if (user && token) {
+      dispatch(fetchUserNotifications(token));
+    }
+  }, [user, token, selectedMain]);
   const favorites = useAppSelector(selectFavorites);
   const firstFavorite = favorites[0]; // أول عنصر في المفضلة
-    const notifications = useAppSelector((state) => state.notifications.notifications);
+  const notifications = useAppSelector((state) => state.notifications.notifications);
 
   // حساب عدد الإشعارات غير المقروءة
   const unreadCount = user
@@ -55,7 +69,7 @@ export default function HomeScreen() {
   //     const { expoPushToken, notification } = usePushNotifications();
   // const data = JSON.stringify(notification, undefined, 2);
   // console.log(expoPushToken?.data,"expoPushToken",data);
-  
+
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
 
@@ -67,6 +81,8 @@ export default function HomeScreen() {
             <TextInput
               placeholder="بحث..."
               style={styles.searchInputWithIcon}
+              value={searchText}
+              onChangeText={setSearchText}
               placeholderTextColor="#2e7d32"
             />
           </View>
@@ -75,42 +91,42 @@ export default function HomeScreen() {
 
       <ScrollView style={{ flex: 1 }} onScroll={handleScroll} scrollEventThrottle={16}>
         {/* الهيدر الكبير */}
-    <View style={{ position: 'relative' }}>
-        <Image
-          source={{ uri: 'https://i.pinimg.com/1200x/db/62/41/db62413910729e4e33d15d30e57a112a.jpg' }}
-          style={{ width: '100%', height: 200 }}
-        />
+        <View style={{ position: 'relative' }}>
+          <Image
+            source={{ uri: 'https://i.pinimg.com/1200x/db/62/41/db62413910729e4e33d15d30e57a112a.jpg' }}
+            style={{ width: '100%', height: 200 }}
+          />
 
-        {/* أيقونة الجرس */}
-        <Pressable
-          style={{ position: 'absolute', top: 30, right: 16 }}
-          onPress={() => router.push('/notifications')}
-        >
-          <Ionicons name="notifications-outline" size={20} color="#fff" />
+          {/* أيقونة الجرس */}
+          <Pressable
+            style={{ position: 'absolute', top: 30, right: 16 }}
+            onPress={() => router.push('/notifications')}
+          >
+            <Ionicons name="notifications-outline" size={20} color="#fff" />
 
-          {/* Badge عدد الإشعارات غير المقروءة */}
-          {unreadCount > 0 && (
-            <View
-              style={{
-                position: 'absolute',
-                top: -6,
-                right: -6,
-                backgroundColor: 'red',
-                borderRadius: 10,
-                paddingHorizontal: 5,
-                minWidth: 15,
-                height: 15 ,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <Text style={{ color: '#fff', fontSize: 12, fontWeight: 'bold' }}>
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </Text>
-            </View>
-          )}
-        </Pressable>
-      </View>
+            {/* Badge عدد الإشعارات غير المقروءة */}
+            {unreadCount > 0 && (
+              <View
+                style={{
+                  position: 'absolute',
+                  top: -6,
+                  right: -6,
+                  backgroundColor: 'red',
+                  borderRadius: 10,
+                  paddingHorizontal: 5,
+                  minWidth: 15,
+                  height: 15,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <Text style={{ color: '#fff', fontSize: 8, fontWeight: 'bold' }}>
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </Text>
+              </View>
+            )}
+          </Pressable>
+        </View>
 
 
         {/* الكارد الرئيسي */}
@@ -127,13 +143,14 @@ export default function HomeScreen() {
               </Pressable>
 
               <Pressable
-                onPress={() => setSelectedMain('projects')}
-                style={[styles.mainButton, selectedMain === 'projects' && styles.activeBtnGreen]}
+                onPress={() => setSelectedMain('studentHousing')}
+                style={[styles.mainButton, selectedMain === 'studentHousing' && styles.activeBtnGreen]}
               >
-                <Text style={[styles.btnText, selectedMain === 'projects' && { color: '#fff' }]}>
-                  مشاريع جديدة
+                <Text style={[styles.btnText, selectedMain === 'studentHousing' && { color: '#fff' }]}>
+                  سكن طلاب
                 </Text>
               </Pressable>
+
             </View>
           </View>
         )}
@@ -167,27 +184,33 @@ export default function HomeScreen() {
               <TextInput
                 placeholder="بحث..."
                 style={styles.searchInputWithIcon}
+                value={searchText}
+                onChangeText={setSearchText}
                 placeholderTextColor="#2e7d32"
               />
             </View>
           </View>
         )}
 
-        {!showMiniHeader && selectedMain === 'projects' && (
-          <View style={styles.optionsCard}>
-            <TextInput
-              placeholder="بحث..."
-              style={styles.searchInput}
-              placeholderTextColor="#666"
-            />
-          </View>
+        {!showMiniHeader && selectedMain === 'studentHousing' && (
+       <View style={[styles.optionsCard, { flexDirection: 'row', alignItems: 'center' }]}>
+  <Ionicons name="search" size={20} color="#2e7d32" style={{ marginRight: 8 }} />
+  <TextInput
+    placeholder="بحث..."
+    style={[styles.searchInput, { flex: 1 }]} // flex:1 لتملأ المساحة المتبقية
+    value={searchText}
+    onChangeText={setSearchText}
+    placeholderTextColor="#666"
+  />
+</View>
+
         )}
 
         {/* مساحة افتراضية للتمرير */}
         <View style={{ height: 20 }} />
 
         {/* عنصر المفضلة وزر المحفوظات - دائم الظهور */}
-        {firstFavorite && (
+        {firstFavorite && selectedMain && (
           <View style={{ padding: 16, marginBottom: 80 }}>
             <View key={firstFavorite._id} style={{ marginBottom: 20 }}>
               <PropertyCard
@@ -247,10 +270,10 @@ export default function HomeScreen() {
                 <Pressable style={styles.menuItem} onPress={() => router.push('/list')}>
                   <Text style={styles.menuText}>عرض القائمة</Text>
                 </Pressable>
-                  <Pressable style={styles.menuItem} onPress={() => router.push('/users/list')}>
+                <Pressable style={styles.menuItem} onPress={() => router.push('/users/list')}>
                   <Text style={styles.menuText}>المستخدمين</Text>
                 </Pressable>
-                
+
               </View>
             )}
 

@@ -2,7 +2,6 @@
 
 import LoadingOverlay from '@/components/LoadingOverlay';
 import { useAppDispatch, useAppSelector } from '@/hooks/useAuth';
-import { saveDeviceToken } from '@/services/userService'; // تأكد من المسار الصحيح
 import { login } from '@/store/authSlice';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
@@ -11,7 +10,6 @@ import React, { useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
 import { Button, Snackbar, TextInput, Title } from 'react-native-paper';
 // أعلى الملف مع باقي الاستيرادات
-import * as Notifications from 'expo-notifications';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -85,15 +83,15 @@ const handleLogin = async () => {
     showSnackbar('تم تسجيل الدخول بنجاح');
 
     // ✅ حفظ Device Token بعد تسجيل الدخول
-    try {
-      const expoPushToken = await Notifications.getExpoPushTokenAsync();
-      if (expoPushToken && res.payload?.token) {
-        await saveDeviceToken(res.payload.token, expoPushToken.data);
-        console.log('✅ Device token saved on backend');
-      }
-    } catch (err) {
-      console.error('❌ Failed to save device token:', err);
-    }
+    // try {
+    //   const expoPushToken = await Notifications.getExpoPushTokenAsync();
+    //   if (expoPushToken && res.payload?.token) {
+    //     await saveDeviceToken(res.payload.token, expoPushToken.data);
+    //     console.log('✅ Device token saved on backend');
+    //   }
+    // } catch (err) {
+    //   console.error('❌ Failed to save device token:', err);
+    // }
 
     setTimeout(() => router.replace('/(tabs)'), 1000);
   } else {

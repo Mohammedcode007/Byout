@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "387226647874",
-    "project_id": "notify-5720b",
-    "storage_bucket": "notify-5720b.firebasestorage.app"
+    "project_number": "653559389586",
+    "project_id": "byoutnew",
+    "storage_bucket": "byoutnew.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:387226647874:android:6cca186aefe68fdd005cdb",
+        "mobilesdk_app_id": "1:653559389586:android:ce70146a9b11687f60f54b",
         "android_client_info": {
           "package_name": "com.mohammed007007.Byout"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBa4j6FmLARhhvjBsMS2uWCSgPDME2A0cc"
+          "current_key": "AIzaSyC5l-_IF0Nm7Fmf-_e0Qy4AN9IHvWZzmb0"
         }
       ],
       "services": {
