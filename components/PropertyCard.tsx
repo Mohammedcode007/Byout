@@ -158,11 +158,11 @@ const PropertyCard: React.FC<PropertyProps> = ({ item, onPress }) => {
         ))}
       </ScrollView>
 
-      <Text style={{ fontWeight: '700', fontSize: 20, textAlign: 'left', color: textColor, marginTop: 10 }}>  {price} ج.م
+      <Text style={{ fontWeight: '700', fontSize: 20, textAlign: 'right', color: textColor, marginTop: 10 }}>  {price} ج.م
       </Text>
 
       {/* معلومات العقار */}
-      <View style={[styles.infoRow, { justifyContent: 'flex-start' }]}>
+      <View style={[styles.infoRow, { justifyContent: 'flex-end' }]}>
         <View style={styles.infoItem}>
           <FontAwesome name="bed" size={16} color='grey' />
           <Text style={[styles.infoText, { color: textColor }]}>{bedrooms}</Text>
@@ -177,11 +177,11 @@ const PropertyCard: React.FC<PropertyProps> = ({ item, onPress }) => {
         </View>
       </View>
       {/* العنوان */}
-      <Text style={{ fontWeight: '700', fontSize: 16, textAlign: 'left', color: textColor,marginLeft:15 }}>{title}</Text>
+      <Text style={{ fontWeight: '700', fontSize: 16, textAlign: 'right', color: textColor,marginRight:15 }}>{title}</Text>
 
       {/* الوصف */}
       <Text
-        style={{ marginVertical: 10, textAlign: 'left', color: textColor ,marginLeft:15 }}
+        style={{ marginVertical: 10, textAlign: 'right', color: textColor ,marginRight:15 }}
         numberOfLines={2}        // يحدد عدد الأسطر المعروضة
         ellipsizeMode="tail"     // يضيف ... في نهاية النص إذا تجاوز السطرين
       >
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   infoItem: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    marginLeft: 15,
+    marginRight: 15,
   },
   infoText: {
     marginRight: 4,

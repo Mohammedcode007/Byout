@@ -1,5 +1,6 @@
 
-
+// // RootLayout.tsx
+// import * as Notifications from 'expo-notifications';
 // import 'react-native-reanimated';
 
 // import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
@@ -13,22 +14,56 @@
 
 // import { FCMTokenHandler } from '@/hooks/FCMTokenHandler';
 // import { persistor, store } from '@/store/store';
+// import registerNNPushToken from 'native-notify';
+// import { useEffect } from 'react';
 // import { Provider } from 'react-redux';
 // import { PersistGate } from 'redux-persist/integration/react';
 
+// // إعداد Notification Handler لعرض الإشعارات على الشاشة
+
+// Notifications.setNotificationHandler({
+//   handleNotification: async (): Promise<Notifications.NotificationBehavior> => ({
+//     shouldPlaySound: true,      // تشغيل الصوت
+//     shouldShowBanner: true,     // ظهور بانر (iOS 14+)
+//     shouldShowList: true,       // ظهور في قائمة الإشعارات (iOS 16+)
+//     shouldSetBadge: false,      // تغيير badge على أيقونة التطبيق
+//   }),
+// });
 // export const unstable_settings = {
 //   anchor: '(tabs)',
 // };
 
 // export default function RootLayout() {
 //   const colorScheme = useColorScheme();
+// registerNNPushToken(32869, 'SRdHaG8mbGIXMm0ZDWPfoA');
 
+//   // مستمع للإشعارات أثناء فتح التطبيق
+//  useEffect(() => {
+//   const subscription = Notifications.addNotificationReceivedListener(notification => {
+//     const data = notification.request.content.data;
+//     console.log('Notification received:', {
+//       title: notification.request.content.title,
+//       body: notification.request.content.body,
+//       data: data,
+//     });
+//   });
+
+//   const responseSubscription =
+//     Notifications.addNotificationResponseReceivedListener(response => {
+//       const data = response.notification.request.content.data;
+//       console.log('User tapped notification:', data);
+//     });
+
+//   return () => {
+//     subscription.remove();
+//     responseSubscription.remove();
+//   };
+// }, []);
 
 //   return (
 //     <Provider store={store}>
 //       <PersistGate loading={null} persistor={persistor}>
-//         <FCMTokenHandler>
-
+//         <FCMTokenHandler> {/* تسجيل التوكن وحفظه على السيرفر */}
 //           <GestureHandlerRootView style={{ flex: 1 }}>
 //             <PaperProvider>
 //               <BottomSheetModalProvider>
@@ -40,14 +75,8 @@
 //                     <Stack.Screen name="Login" options={{ title: 'Login' }} />
 //                     <Stack.Screen name="updateUser" options={{ title: 'updateUser' }} />
 //                     <Stack.Screen name="add" options={{ title: 'إضافة عقار' }} />
-//                     <Stack.Screen
-//                       name="contact-owner/[propertyId]"
-//                       options={{ title: 'اتصل بالمالك' }}
-//                     />
-//                     <Stack.Screen
-//                       name="users/list"
-//                       options={{ title: 'users ' }}
-//                     />
+//                     <Stack.Screen name="contact-owner/[propertyId]" options={{ title: 'اتصل بالمالك' }} />
+//                     <Stack.Screen name="users/list" options={{ title: 'users ' }} />
 //                     <Stack.Screen name="notifications" options={{ title: 'notifications' }} />
 //                     <Stack.Screen name="notification/list" options={{ title: 'list' }} />
 //                   </Stack>
@@ -57,7 +86,6 @@
 //             </PaperProvider>
 //           </GestureHandlerRootView>
 //         </FCMTokenHandler>
-
 //       </PersistGate>
 //     </Provider>
 //   );
@@ -65,6 +93,7 @@
 
 // RootLayout.tsx
 import * as Notifications from 'expo-notifications';
+import React, { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
@@ -76,47 +105,53 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import ThreeSplashScreens from '@/components/ThreeSplashScreens';
 import { FCMTokenHandler } from '@/hooks/FCMTokenHandler';
 import { persistor, store } from '@/store/store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import registerNNPushToken from 'native-notify';
-import { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
-// إعداد Notification Handler لعرض الإشعارات على الشاشة
 
 Notifications.setNotificationHandler({
   handleNotification: async (): Promise<Notifications.NotificationBehavior> => ({
-    shouldPlaySound: true,      // تشغيل الصوت
-    shouldShowBanner: true,     // ظهور بانر (iOS 14+)
-    shouldShowList: true,       // ظهور في قائمة الإشعارات (iOS 16+)
-    shouldSetBadge: false,      // تغيير badge على أيقونة التطبيق
+    shouldPlaySound: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldSetBadge: false,
   }),
 });
+
 export const unstable_settings = {
   anchor: '(tabs)',
 };
 
 export default function RootLayout() {
+  const [showSplash, setShowSplash] = useState<boolean>(true);
   const colorScheme = useColorScheme();
-registerNNPushToken(32869, 'SRdHaG8mbGIXMm0ZDWPfoA');
+  useEffect(() => {
+    const checkSplash = async () => {
+      const seen = await AsyncStorage.getItem('seenSplash');
+      if (seen === 'true') {
+        setShowSplash(false);
+      } else {
+        setShowSplash(true);
+      }
+    };
 
-  // مستمع للإشعارات أثناء فتح التطبيق
+    checkSplash();
+  }, []);
+  registerNNPushToken(32869, 'SRdHaG8mbGIXMm0ZDWPfoA');
+
  useEffect(() => {
   const subscription = Notifications.addNotificationReceivedListener(notification => {
-    const data = notification.request.content.data;
-    console.log('Notification received:', {
-      title: notification.request.content.title,
-      body: notification.request.content.body,
-      data: data,
-    });
+    console.log('Notification received:', notification);
   });
 
-  const responseSubscription =
-    Notifications.addNotificationResponseReceivedListener(response => {
-      const data = response.notification.request.content.data;
-      console.log('User tapped notification:', data);
-    });
+  const responseSubscription = Notifications.addNotificationResponseReceivedListener(response => {
+    console.log('User tapped notification:', response);
+  });
 
   return () => {
     subscription.remove();
@@ -124,10 +159,24 @@ registerNNPushToken(32869, 'SRdHaG8mbGIXMm0ZDWPfoA');
   };
 }, []);
 
+
+if (showSplash === null) return null;
+
+  // عرض شاشات السلاش لأول مرة فقط
+  if (showSplash) {
+    return (
+      <ThreeSplashScreens
+        onFinish={async () => {
+          await AsyncStorage.setItem('seenSplash', 'true');
+          setShowSplash(false);
+        }}
+      />
+    );
+  }
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <FCMTokenHandler> {/* تسجيل التوكن وحفظه على السيرفر */}
+        <FCMTokenHandler>
           <GestureHandlerRootView style={{ flex: 1 }}>
             <PaperProvider>
               <BottomSheetModalProvider>
