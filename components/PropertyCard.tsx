@@ -96,7 +96,6 @@ const PropertyCard: React.FC<PropertyProps> = ({ item, onPress }) => {
   };
 
   const handleCallPress = async () => {
-    console.log(contact?.phone, 'phone');
 
     const phoneNumber = contact?.phone; // أو استخدم رقم منفصل للاتصال إذا أحببت
     const url = `tel:${phoneNumber}`;
@@ -159,11 +158,11 @@ const PropertyCard: React.FC<PropertyProps> = ({ item, onPress }) => {
         ))}
       </ScrollView>
 
-      <Text style={{ fontWeight: '700', fontSize: 20, textAlign: 'right', color: textColor, marginTop: 10 }}>  {price} ج.م
+      <Text style={{ fontWeight: '700', fontSize: 20, textAlign: 'left', color: textColor, marginTop: 10 }}>  {price} ج.م
       </Text>
 
       {/* معلومات العقار */}
-      <View style={[styles.infoRow, { justifyContent: 'flex-end' }]}>
+      <View style={[styles.infoRow, { justifyContent: 'flex-start' }]}>
         <View style={styles.infoItem}>
           <FontAwesome name="bed" size={16} color='grey' />
           <Text style={[styles.infoText, { color: textColor }]}>{bedrooms}</Text>
@@ -178,19 +177,19 @@ const PropertyCard: React.FC<PropertyProps> = ({ item, onPress }) => {
         </View>
       </View>
       {/* العنوان */}
-      <Text style={{ fontWeight: '700', fontSize: 16, textAlign: 'right', color: textColor }}>{title}</Text>
+      <Text style={{ fontWeight: '700', fontSize: 16, textAlign: 'left', color: textColor,marginLeft:15 }}>{title}</Text>
 
       {/* الوصف */}
       <Text
-        style={{ marginVertical: 10, textAlign: 'right', color: textColor }}
+        style={{ marginVertical: 10, textAlign: 'left', color: textColor ,marginLeft:15 }}
         numberOfLines={2}        // يحدد عدد الأسطر المعروضة
         ellipsizeMode="tail"     // يضيف ... في نهاية النص إذا تجاوز السطرين
       >
         {description}
       </Text>
 
-
-      {/* أزرار التواصل */}
+<View >
+    {/* أزرار التواصل */}
       <ContactButtons
         subTextColor='#005d64'
         contactBackground='#e5eff0'
@@ -201,6 +200,8 @@ const PropertyCard: React.FC<PropertyProps> = ({ item, onPress }) => {
         onPressEmail={() => console.log(contact.email ?? 'لا يوجد بريد')}
         onPressCall={handleCallPress}
       />
+</View>
+  
 
     </ScrollView>
   );
@@ -221,7 +222,7 @@ const styles = StyleSheet.create({
   heartIcon: {
     position: 'absolute',
     bottom: 10,
-    left: 10,
+    right: 10,
   },
   infoRow: {
     flexDirection: 'row',
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
   tagsContainer: {
     position: 'absolute',
     top: 10,
-    left: '65%',
+    right: '65%',
     flexDirection: 'row',
     gap: 5, // أو marginRight بين الـ tags
     zIndex: 2,

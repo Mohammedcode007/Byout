@@ -10,7 +10,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, Text, TextInput, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
@@ -21,7 +21,8 @@ export default function HomeScreen() {
   const [menuOpen, setMenuOpen] = useState(false);
   const dispatch = useAppDispatch();
   const { user, token, role, isLoggedIn } = useAppSelector((state) => state.auth);
-
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
   const [searchText, setSearchText] = useState('');
   // useFocusEffect(
   //   useCallback(() => {
@@ -34,16 +35,16 @@ export default function HomeScreen() {
   //     }
   //   }, [dispatch, token, selectedMain, searchText])
   // );
-useFocusEffect(
-  useCallback(() => {
-    dispatch(fetchProperties({
-      isStudentHousing: selectedMain === 'studentHousing',
-    }));
-    if (token) {
-      dispatch(fetchFavorites(token));
-    }
-  }, [dispatch, token, selectedMain])
-);
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(fetchProperties({
+        isStudentHousing: selectedMain === 'studentHousing',
+      }));
+      if (token) {
+        dispatch(fetchFavorites(token));
+      }
+    }, [dispatch, token, selectedMain])
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -78,21 +79,20 @@ useFocusEffect(
     : 0;
 
   const { properties, loading, error } = useAppSelector((state) => state.property);
-  console.log(properties, '88888888');
- const handleSearchPress = () => {
-  if (searchText.trim() === '') {
-    Alert.alert('من فضلك أدخل نص البحث');
-    return;
-  }
-  router.push({
-    pathname: '/search',
-    params: { q: searchText }
-  });
-};
+  const handleSearchPress = () => {
+    if (searchText.trim() === '') {
+      Alert.alert('من فضلك أدخل نص البحث');
+      return;
+    }
+    router.push({
+      pathname: '/search',
+      params: { q: searchText }
+    });
+  };
 
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+    <View style={{ flex: 1, backgroundColor: isDark ? "black" : '#fff' }}>
 
       {/* Header صغير يظهر عند التمرير */}
       {showMiniHeader && (
@@ -154,7 +154,7 @@ useFocusEffect(
 
         {/* الكارد الرئيسي */}
         {!showMiniHeader && (
-          <View style={styles.floatingCard}>
+          <View style={[styles.floatingCard,{backgroundColor : isDark ? "black" : 'white'}]}>
             <View style={styles.buttonRow}>
               <Pressable
                 onPress={() => setSelectedMain('aqarat')}
@@ -180,7 +180,7 @@ useFocusEffect(
 
         {/* كارد الخيارات */}
         {!showMiniHeader && selectedMain === 'aqarat' && (
-          <View style={styles.optionsCard}>
+          <View style={[styles.optionsCard,{backgroundColor:isDark ? 'black':'white'}]}>
             <View style={styles.buttonRow}>
               <Pressable
                 onPress={() => setSelectedOption('sale')}
@@ -327,7 +327,6 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   floatingCard: {
-    backgroundColor: 'white',
     padding: 10,
     borderRadius: 20,
     marginTop: -120,

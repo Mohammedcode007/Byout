@@ -2,7 +2,7 @@
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Alert, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Linking, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 
 type ContactButtonsProps = {
   subTextColor?: string;
@@ -28,8 +28,12 @@ export default function ContactButtons({
   whatsappNumber = '+201001186472',
 }: ContactButtonsProps) {
   const router = useRouter();
-console.log(uniqueId,ownerEmail);
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
+  // الألوان الافتراضية بناءً على الوضع الليلي
+  const textClr = subTextColor ?? (isDark ? '#66c0ff' : '#003366');
+  const bgClr = contactBackground ?? (isDark ? '#1C1C1E' : 'rgba(217, 248, 217, 0.7)');
  const handleEmailPress = () => {
   if (!ownerEmail || !uniqueId) {
     Alert.alert('خطأ', 'لا يوجد بريد إلكتروني أو معرف العقار غير متوفر');
@@ -65,31 +69,29 @@ console.log(uniqueId,ownerEmail);
   };
 
   return (
-    <View style={[styles.infoRow, { justifyContent: 'center' }]}>
+   <View style={[styles.infoRow, { justifyContent: 'center' }]}>
       <Pressable
-        style={[styles.contactTag, { backgroundColor: contactBackground }]}
+        style={[styles.contactTag, { backgroundColor: bgClr }]}
         onPress={handleEmailPress}
       >
-        <Ionicons name="mail-outline" size={16} color={subTextColor} />
-        <Text style={[styles.contactText, { color: subTextColor }]}>إيميل</Text>
+        <Ionicons name="mail-outline" size={16} color={textClr} />
+        <Text style={[styles.contactText, { color: textClr }]}>إيميل</Text>
       </Pressable>
 
       <Pressable
-        style={[styles.contactTag, { backgroundColor: contactBackground }]}
-        onPress={() => {
-          console.log('تم الضغط على الزر!');
-          onPressCall && onPressCall(); // ← استدعاء الدالة إذا كانت موجودة
-        }}      >
-        <Ionicons name="call-outline" size={16} color={subTextColor} />
-        <Text style={[styles.contactText, { color: subTextColor }]}>اتصال</Text>
-      </Pressable>
-
-      <Pressable
-        style={[styles.contactTag, { backgroundColor: contactBackground }]}
-        onPress={handleWhatsAppPress} // ← هنا
+        style={[styles.contactTag, { backgroundColor: bgClr }]}
+        onPress={() => onPressCall && onPressCall()}
       >
-        <FontAwesome name="whatsapp" size={16} color={subTextColor} />
-        <Text style={[styles.contactText, { color: subTextColor }]}>واتساب</Text>
+        <Ionicons name="call-outline" size={16} color={textClr} />
+        <Text style={[styles.contactText, { color: textClr }]}>اتصال</Text>
+      </Pressable>
+
+      <Pressable
+        style={[styles.contactTag, { backgroundColor: bgClr }]}
+        onPress={handleWhatsAppPress}
+      >
+        <FontAwesome name="whatsapp" size={16} color={textClr} />
+        <Text style={[styles.contactText, { color: textClr }]}>واتساب</Text>
       </Pressable>
     </View>
   );
@@ -100,6 +102,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
     alignItems: 'center',
     marginVertical: 5,
+    marginHorizontal:10
   },
   contactTag: {
     flexDirection: 'row-reverse',

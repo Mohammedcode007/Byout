@@ -1,3 +1,4 @@
+import i18n from '@/i18n';
 import React, { useRef } from 'react';
 import { Animated, I18nManager, Image, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 
@@ -65,14 +66,21 @@ export default function ActivityCard({ onPress }: ActivityCardProps) {
         />
 
         <View style={{ flex: 1 }}>
-          <Text style={[styles.title, { color: textColor }]}>نشاطي</Text>
-          <Text style={[styles.description, { color: descriptionColor }]}>
-            تعرف على تفاعلاتك الأخيرة داخل التطبيق
+          <Text style={[styles.title, { color: textColor }]}>
+            {i18n.locale.startsWith('ar')
+              ? 'نشاطي'
+              : 'My Activity'}
           </Text>
+          <Text style={[styles.description, { color: descriptionColor }]}>
+            {i18n.locale.startsWith('ar')
+              ? 'تعرف على تفاعلاتك الأخيرة داخل التطبيق'
+              : 'See your recent interactions inside the app'}
+          </Text>
+
         </View>
 
         <Text style={[styles.arrow, { color: '#4A90E2' }]}>
-          {I18nManager.isRTL ? '←' : '→'}
+          {i18n.locale.startsWith('ar') ? '←' : '→'}
         </Text>
       </Animated.View>
     </Pressable>

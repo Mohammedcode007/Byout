@@ -1,12 +1,13 @@
 import ContactButtons from '@/components/ContactButtons';
 import { useAppDispatch, useAppSelector } from '@/hooks/useAuth';
+import i18n from '@/i18n';
 import { addToFavorites, removeFromFavorites, selectFavorites } from '@/store/favoritesSlice';
 import { fetchProperty } from '@/store/propertieSlice';
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useMemo, useRef } from 'react';
-import { ActivityIndicator, Alert, Dimensions, Image, Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, Image, Linking, Pressable, ScrollView, Share, StyleSheet, Text, useColorScheme, View } from 'react-native';
 
 const { height } = Dimensions.get('window');
 
@@ -16,10 +17,8 @@ export default function PropertyDetailScreen() {
 
   const id =
     typeof params.id === "string" ? params.id : params.id?.[0];
-  console.log(id, 'id');
   const { property, loading } = useAppSelector((state) => state.property);
 
-  console.log(property);
 
   useEffect(() => {
     if (id) {
@@ -66,9 +65,15 @@ export default function PropertyDetailScreen() {
     })
     .filter(Boolean);
 
-
   const bottomSheetRef = useRef<BottomSheet>(null);
 
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
+    const textColor = isDark ? '#fff' : '#222';
+  const subTextColor = isDark ? '#ccc' : '#555';
+  const sectionTitleColor = isDark ? '#fff' : '#222';
+  const iconColor = isDark ? '#66c0ff' : '#003366';
+  const bottomSheetBg = isDark ? '#121212' : '#fff';
   // Snap points: الثلث السفلي و 3/4 الشاشة
   const snapPoints = useMemo(() => [height / 3, (height * 3) / 4], []);
 
@@ -136,7 +141,7 @@ https://byout.app/property/${property._id}
   if (loading) return <ActivityIndicator size="large" />;
   if (!property) return <Text>لا يوجد بيانات</Text>;
   return (
-    <View style={styles.container}>
+    <View style={[styles.container,{backgroundColor:isDark ? 'black' : 'white'}]}>
       {/* الصور أعلى */}
       <ScrollView style={{ flex: 1, marginBottom: height / 3 }}>
         {images.map((img, index) => (
@@ -172,86 +177,70 @@ https://byout.app/property/${property._id}
       </View>
 
       {/* Bottom Sheet */}
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={0}
-        snapPoints={snapPoints}
-        enablePanDownToClose={false}
-        backgroundStyle={styles.bottomSheet}
-        handleIndicatorStyle={styles.pullIcon}
-      >
-        <BottomSheetScrollView contentContainerStyle={{ padding: 16 }}>
-          {/* العنوان والوصف */}
-          <Text style={styles.title}>{property.title}</Text>
-          <Text style={styles.address}>
-            العنوان: {property.location.street} - {property.location.city}
-          </Text>
+       <BottomSheet
+      ref={bottomSheetRef}
+      index={0}
+      snapPoints={snapPoints}
+      enablePanDownToClose={false}
+      backgroundStyle={[styles.bottomSheet, { backgroundColor: bottomSheetBg }]}
+      handleIndicatorStyle={styles.pullIcon}
+    >
+      <BottomSheetScrollView contentContainerStyle={{ padding: 16 }}>
+        {/* العنوان والوصف */}
+        <Text style={[styles.title, { color: textColor }]}>{property.title}</Text>
+        <Text style={[styles.address, { color: subTextColor }]}>
+          {i18n.locale.startsWith('ar') ? 'العنوان' : 'Address'}: {property.location.street} - {property.location.city}
+        </Text>
+        <Text style={[styles.description, { color: subTextColor }]}>{property.description}</Text>
 
-          <Text style={styles.description}>{property.description}</Text>
+        <View style={styles.divider} />
 
+        {/* مميزات العقار */}
+        <Text style={[styles.sectionTitle, { color: sectionTitleColor }]}>
+          {i18n.locale.startsWith('ar') ? 'مميزات العقار' : 'Property Features'}
+        </Text>
+        <View style={styles.featuresGrid}>
+          {features.map((item, i) => (
+            <View key={i} style={styles.featureItem}>
+              <Ionicons name={item.icon as any} size={18} color={iconColor} style={{ marginLeft: 4 }} />
+              <Text style={[styles.featureText, { color: textColor }]}>{item.label}</Text>
+            </View>
+          ))}
+        </View>
 
-          <View style={styles.divider} />
+        <View style={styles.divider} />
 
-          {/* مميزات العقار */}
-          <Text style={styles.sectionTitle}>مميزات العقار</Text>
-          <View style={styles.featuresGrid}>
-            {features.map((item, i) => (
-              <View key={i} style={styles.featureItem}>
-                <Ionicons name={item.icon as any} size={18} color="#003366" style={{ marginLeft: 4 }} />
-                <Text style={styles.featureText}>{item.label}</Text>
-              </View>
-            ))}
-          </View>
+        {/* الخدمات والمرافق */}
+        <Text style={[styles.sectionTitle, { color: sectionTitleColor }]}>
+          {i18n.locale.startsWith('ar') ? 'الخدمات والمرافق' : 'Services & Facilities'}
+        </Text>
+        <View style={styles.servicesGrid}>
+          {services?.map((item, i) => (
+            <View key={i} style={styles.serviceItem}>
+              <MaterialCommunityIcons
+                name={item?.icon}
+                size={18}
+                color={iconColor}
+                style={{ marginLeft: 4 }}
+              />
+              <Text style={[styles.serviceText, { color: textColor }]}>{item?.label}</Text>
+            </View>
+          ))}
+        </View>
 
-          <View style={styles.divider} />
+        <View style={styles.divider} />
 
-          {/* الخدمات والمرافق */}
-          <Text style={styles.sectionTitle}>الخدمات والمرافق</Text>
-          <View style={styles.servicesGrid}>
-            {services?.map((item, i) => (
-              <View key={i} style={styles.serviceItem}>
-                <MaterialCommunityIcons
-                  name={item?.icon}
-                  size={18}
-                  color="#003366"
-                  style={{ marginLeft: 4 }}
-                />
-                <Text style={styles.serviceText}>{item?.label}</Text>
-              </View>
-            ))}
-
-          </View>
-
-
-          <View style={styles.divider} />
-
-          {/* أزرار الاتصال */}
-          <ContactButtons
-            subTextColor='#005d64'
-            contactBackground='#e5eff0'
-            uniqueId={property.uniqueId}
-            ownerEmail={ownerEmail}
-            // ownerName={ownerName}
-            propertyTitle={property.title}
-            // onPressEmail={() => console.log(contact.email ?? 'لا يوجد بريد')}
-            onPressCall={handleCallPress}
-          />
-          {/* <View style={styles.buttonsRow}>
-      <View style={styles.contactButton}>
-        <FontAwesome5 name="whatsapp" size={16} color="#fff" />
-        <Text style={styles.buttonText}>واتس آب</Text>
-      </View>
-      <View style={styles.contactButton}>
-        <Ionicons name="call-outline" size={16} color="#fff" />
-        <Text style={styles.buttonText}>اتصال</Text>
-      </View>
-      <View style={styles.contactButton}>
-        <Ionicons name="mail-outline" size={16} color="#fff" />
-        <Text style={styles.buttonText}>إيميل</Text>
-      </View>
-    </View> */}
-        </BottomSheetScrollView>
-      </BottomSheet>
+        {/* أزرار الاتصال */}
+        <ContactButtons
+          subTextColor={isDark ? '#66c0ff' : '#005d64'}
+          contactBackground={isDark ? '#1C1C1E' : '#e5eff0'}
+          uniqueId={property.uniqueId}
+          ownerEmail={ownerEmail}
+          propertyTitle={property.title}
+          onPressCall={handleCallPress}
+        />
+      </BottomSheetScrollView>
+    </BottomSheet>
 
     </View>
   );

@@ -1,3 +1,4 @@
+import i18n from '@/i18n';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, StyleSheet, Text, useColorScheme } from 'react-native';
@@ -40,7 +41,7 @@ export default function MoreItem({
       {/* Arrow */}
       {showArrow && (
         <Ionicons
-          name="chevron-forward"
+          name={i18n.locale.startsWith('ar') ? "chevron-back-sharp" : "chevron-forward" }
           size={22}
           color={isDark ? '#aaa' : '#999'}
           style={{ opacity: 0.6 }}
