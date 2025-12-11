@@ -42,7 +42,6 @@ export default function LocationBar({ onSaveLocation }: Props) {
           });
         }
       } catch (error) {
-        console.log('خطأ في جلب الموقع من Local Storage:', error);
       }
     };
     loadStoredLocation();

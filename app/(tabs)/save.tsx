@@ -34,9 +34,7 @@ export default function SaveScreen() {
     );
   const favorites = useAppSelector(selectFavorites);
   
-  useEffect(() => {
-    console.log("Favorites updated:", favorites);
-  }, [favorites]);
+ 
   return (
     <AuthGate>
             <View style={{

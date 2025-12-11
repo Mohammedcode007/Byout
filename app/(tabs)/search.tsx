@@ -169,11 +169,8 @@ export default function SearchScreen() {
 
   const favorites = useAppSelector(selectFavorites);
 
-  useEffect(() => {
-    console.log("Favorites updated:", favorites);
-  }, [favorites]);
+
   const ownerEmail = 'code.hassan.1992@gmail.com'
-  console.log(i18n.locale.startsWith('ar'),'777777');
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor }}>

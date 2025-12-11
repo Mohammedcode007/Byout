@@ -41,7 +41,6 @@ export const getProperties = async (params?: {
    isStudentHousing?: boolean; // <-- جديد: فلتر العقارات الطلابية
   search?: string; // <-- جديد: البحث النصي في العنوان
 }) => {
-    console.log('test');
     
   const response = await axios.get(`${API_URL}/properties`, { params });
   return response.data;

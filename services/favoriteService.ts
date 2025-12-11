@@ -8,7 +8,6 @@ const api = axios.create({
 
 // جلب قائمة المفضلة
 export const getFavorites = async (token: string) => {
-    console.log(token,'token');
     
   const res = await api.get("/favorites", {
     headers: { Authorization: `Bearer ${token}` },
