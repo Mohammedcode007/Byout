@@ -1,5 +1,5 @@
 import React from 'react';
-import { I18nManager, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 interface Props {
   children?: React.ReactNode;    // يقبل كلام – أيقونة – أو الاثنين
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     borderColor: 'green',
   },
   inner: {
-    flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
+    flexDirection:'row-reverse' ,
     alignItems: 'center',
     justifyContent: 'center',  // ← التوسيط
   }

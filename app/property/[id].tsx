@@ -1,6 +1,5 @@
 import ContactButtons from '@/components/ContactButtons';
 import { useAppDispatch, useAppSelector } from '@/hooks/useAuth';
-import i18n from '@/i18n';
 import { addToFavorites, removeFromFavorites, selectFavorites } from '@/store/favoritesSlice';
 import { fetchProperty } from '@/store/propertieSlice';
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -189,7 +188,7 @@ https://byout.app/property/${property._id}
         {/* العنوان والوصف */}
         <Text style={[styles.title, { color: textColor }]}>{property.title}</Text>
         <Text style={[styles.address, { color: subTextColor }]}>
-          {i18n.locale.startsWith('ar') ? 'العنوان' : 'Address'}: {property.location.street} - {property.location.city}
+       العنوان: {property.location.street} - {property.location.city}
         </Text>
         <Text style={[styles.description, { color: subTextColor }]}>{property.description}</Text>
 
@@ -197,7 +196,7 @@ https://byout.app/property/${property._id}
 
         {/* مميزات العقار */}
         <Text style={[styles.sectionTitle, { color: sectionTitleColor }]}>
-          {i18n.locale.startsWith('ar') ? 'مميزات العقار' : 'Property Features'}
+         مميزات العقار
         </Text>
         <View style={styles.featuresGrid}>
           {features.map((item, i) => (
@@ -212,7 +211,7 @@ https://byout.app/property/${property._id}
 
         {/* الخدمات والمرافق */}
         <Text style={[styles.sectionTitle, { color: sectionTitleColor }]}>
-          {i18n.locale.startsWith('ar') ? 'الخدمات والمرافق' : 'Services & Facilities'}
+     الخدمات والمرافق
         </Text>
         <View style={styles.servicesGrid}>
           {services?.map((item, i) => (

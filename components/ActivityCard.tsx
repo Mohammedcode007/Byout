@@ -1,6 +1,5 @@
-import i18n from '@/i18n';
 import React, { useRef } from 'react';
-import { Animated, I18nManager, Image, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { Animated, Image, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 
 interface ActivityCardProps {
   onPress: () => void;
@@ -14,7 +13,7 @@ export default function ActivityCard({ onPress }: ActivityCardProps) {
   const handlePressIn = () => {
     Animated.parallel([
       Animated.spring(translateAnim, {
-        toValue: I18nManager.isRTL ? -8 : 8,
+        toValue:  -8 ,
         useNativeDriver: true,
       }),
       Animated.spring(scaleAnim, {
@@ -67,20 +66,16 @@ export default function ActivityCard({ onPress }: ActivityCardProps) {
 
         <View style={{ flex: 1 }}>
           <Text style={[styles.title, { color: textColor }]}>
-            {i18n.locale.startsWith('ar')
-              ? 'نشاطي'
-              : 'My Activity'}
+              نشاطي
           </Text>
           <Text style={[styles.description, { color: descriptionColor }]}>
-            {i18n.locale.startsWith('ar')
-              ? 'تعرف على تفاعلاتك الأخيرة داخل التطبيق'
-              : 'See your recent interactions inside the app'}
+              تعرف على تفاعلاتك الأخيرة داخل التطبيق
           </Text>
 
         </View>
 
         <Text style={[styles.arrow, { color: '#4A90E2' }]}>
-          {i18n.locale.startsWith('ar') ? '←' : '→'}
+           ←
         </Text>
       </Animated.View>
     </Pressable>
@@ -93,7 +88,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   card: {
-    flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
+    flexDirection: 'row-reverse' ,
     padding: 16,
     borderRadius: 18,
     alignItems: 'center',
@@ -104,21 +99,25 @@ const styles = StyleSheet.create({
   image: {
     width: 55,
     height: 55,
-    marginRight: I18nManager.isRTL ? 0 : 15,
-    marginLeft: I18nManager.isRTL ? 15 : 0,
+    marginRight:  0 
   },
   title: {
+    textAlign:'right',
     fontSize: 18,
     fontWeight: '700',
     marginBottom: 3,
+            marginRight:10
+
   },
   description: {
     fontSize: 14,
+        textAlign:'right',
+        marginRight:10
+
   },
   arrow: {
     fontSize: 22,
     fontWeight: '900',
-    marginLeft: I18nManager.isRTL ? 0 : 10,
-    marginRight: I18nManager.isRTL ? 10 : 0,
+    marginLeft:  0
   },
 });

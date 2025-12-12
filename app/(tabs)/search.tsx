@@ -108,7 +108,6 @@ import LocationBar from '@/components/LocationBar';
 import PropertyCard from '@/components/PropertyCard';
 import SearchFilters from '@/components/SearchFilters';
 import { useAppDispatch, useAppSelector } from '@/hooks/useAuth';
-import i18n from '@/i18n';
 import { fetchFavorites, selectFavorites } from '@/store/favoritesSlice';
 import { fetchProperties } from '@/store/propertieSlice';
 import { MaterialIcons } from '@expo/vector-icons';

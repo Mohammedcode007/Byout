@@ -7,7 +7,7 @@ import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useMemo, useRef, useState } from 'react';
-import { I18nManager, Pressable, ScrollView, StyleSheet, Text, TextInput, useColorScheme, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, useColorScheme, View } from 'react-native';
 import { Portal } from 'react-native-paper';
 import LocationFilter from './LocationFilter';
 import TagBox from './TagBox';
@@ -284,7 +284,7 @@ export default function SearchFilters({ onFilterPress, onClearFilters }: Props) 
           isSelected={selectedFilters.includes('للبيع') || selectedFilters.includes('للايجار')}
           onPress={() => toggleFilter('للبيع', true)}
         >
-          <View style={{ flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row', alignItems: 'center' }}>
+          <View style={{ flexDirection:'row-reverse' , alignItems: 'center' }}>
             <Text style={{ fontSize: 15, marginHorizontal: 6 }}>{saleType ?? 'للبيع'}</Text>
             <Ionicons name="chevron-down-outline" size={10} color="#444" />
           </View>
@@ -321,7 +321,7 @@ export default function SearchFilters({ onFilterPress, onClearFilters }: Props) 
               isSelected={isSelected}
               onPress={() => toggleFilter(item.label!, hasBottomSheet)}
             >
-              <View style={{ flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row', alignItems: 'center' }}>
+              <View style={{ flexDirection: 'row-reverse' , alignItems: 'center' }}>
                 {item.icon && <View style={{ marginHorizontal: 4 }}>{item.icon}</View>}
                 <Text style={{ fontSize: 14 }}>{item.label}</Text>
                 {!isSingleSelect && hasBottomSheet && item.label !== 'للبيع' && (

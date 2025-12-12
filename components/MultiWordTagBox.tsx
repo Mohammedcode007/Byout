@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { I18nManager, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 interface Props {
   words: string[];
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   inner: {
-    flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
+    flexDirection:  'row-reverse' ,
     alignItems: 'center',
     gap: 6,
   },
